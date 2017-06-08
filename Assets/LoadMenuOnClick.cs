@@ -10,6 +10,7 @@ public class LoadMenuOnClick : MonoBehaviour {
 	{
 
 		GameObject current = gameObject.transform.parent.gameObject;
+		Debug.Log (current.name);
 		GameObject parent = current.transform.parent.gameObject;
 		Transform[] trs = parent.GetComponentsInChildren<Transform>(true);
 
@@ -19,6 +20,7 @@ public class LoadMenuOnClick : MonoBehaviour {
 			}
 		}
 
+		Debug.Log (current.name);
 		current.SetActive(false);
 
 	}
