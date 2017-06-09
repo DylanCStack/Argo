@@ -8,132 +8,113 @@ using ZXing.QrCode;
 
 public class QrScanner : MonoBehaviour {
 
-
-
+	//variables determined in runtime
 	private WebCamTexture camTexture;
-	private Rect screenRect;
-	public String QRData;
+	private String QRData;
 
-	public int x;
-	public int y;
-	public int width;
-	public int height;
 
+	//variables set in editor to determine the scanner dimensions
+	public double ScannerHeight;
+	public double ScannerWidth;
+
+	//pixel dimensions determined by scanner size relative to screen and camera
+	private int rectWidth;
+	private int rectHeight;
+
+	//texture of scanner. If empty will be a dark grey, translucent box
 	public Texture2D texture;
 
+	private Rect guide;
 
 
 	void Start() {
 
-		texture = new Texture2D(1,1);
-		texture.SetPixel(0,0, new Color(255,20,20,1));
-		texture.wrapMode = TextureWrapMode.Repeat;
-		texture.Apply ();
-
-
-		////////////////////////////////////////////
-		GameObject guide = GameObject.Find ("QRScanGuide");
-		RectTransform guideRect = guide.GetComponent<RectTransform> ();
 
 
 
-//		screenRect = new Rect(0, 0, Screen.width, Screen.height);
+		if (texture != null) {//set guide texture if empty
+			texture = new Texture2D (1, 1);
+			texture.SetPixel (0, 0, new Color (255, 20, 20, 1));
+			texture.wrapMode = TextureWrapMode.Repeat;
+			texture.Apply ();
+		}
+
+		//initialize camera feed
 		camTexture = new WebCamTexture();
 		camTexture.requestedHeight = Screen.height; 
 		camTexture.requestedWidth = Screen.width;
 
 		if (camTexture != null) {
-			camTexture.Play();
+			camTexture.Play();//starts camera
 		}
+		/////////
+		ScannerHeight = 0.5;
+		ScannerWidth = 0.5;
 
+//		int baseW = (Screen.width < camTexture.width) ? Screen.width : camTexture.width;
+//		int baseh = (Screen.height < camTexture.height) ? Screen.height : camTexture.height;
 
-		Vector2 gmin = guideRect.anchorMin;
-		Vector2 gmax = guideRect.anchorMax;
-//		Vector2 pmin = guide.
+		rectWidth = (int)(Screen.width * ScannerHeight);
+		rectHeight = (int)(Screen.height * ScannerWidth);
 
-		Debug.Log (gmin);
-
-
-		Vector2 min = gmin;
-		Vector2 max = gmax;
-		
-
-		x = (int) (min.x*Screen.width);
-		y = (int) (min.y*Screen.height);
-		width = (int) guideRect.rect.width;
-		height = (int) guideRect.rect.height;
-
-//		x = 0;
-//		y = 0;
-//		width = Screen.width;
-//		height = Screen.height;
-
-//		Debug.Log ("x,y: " + x + " : " + y);
-//		Debug.Log ("Width,Height: " + width + " : " + height);
-
-
-
-
-		InvokeRepeating ("QRScan", 0f, 0.5f); 
-	}
-	void OnGUI()
-	{
-		int rectWidth = (int)(Screen.width);
-		int rectHeight = (int)(Screen.height * 0.4);
 		int xStart = (int)((Screen.width * 0.5) - (rectWidth * 0.5));
 		int yStart = (int)((Screen.height * 0.5) - (rectHeight * 0.5));
 
-		GUI.Box(new Rect(xStart, yStart, rectWidth, rectHeight), texture);
+		guide = new Rect (xStart, yStart, rectWidth, rectHeight);
+			
+		InvokeRepeating ("QRScan", 0f, 0.5f);// repeatedly runs QRScan every 0.5s starting in 0s
+	}
+	void OnGUI()
+	{
+		GUI.Box(guide, texture);//draws guide on screen
 	}
 
 	void QRScan () {
-		// drawing the camera on screen
-//		GUI.DrawTexture (screenRect, camTexture, ScaleMode.ScaleToFit);
 		// do the reading — you might want to attempt to read less often than you draw on the screen for performance sake
 		try {
-			Debug.Log ("SCREEN Width,Height: " + Screen.width + " : " + Screen.height);
-			Debug.Log ("CAMERA TEXTURE Width,Height: " + camTexture.width + " : " + camTexture.height);
+			//capture frame and slice off all but the center 1/2
 
-			// decode the current frame
-//			Color[] colorPixels = camTexture.GetPixels();
-////			Color[] colorPixels = camTexture.GetPixels(x,y,width,height);
-//			List<Color32> color32PixelsList = new List<Color32>();
-//
-//
-//			foreach(Color c in colorPixels){
-//				color32PixelsList.Add((Color32) c);
-//			}
-//			Color32[] color32Pixels = color32PixelsList.ToArray();
+			Debug.Log("SCREEN WIDTH/HEIGHT: " + Screen.width + " , " + Screen.height);
+			Debug.Log("CAMERA WIDTH/HEIGHT: " + camTexture.width + " , " + camTexture.height);
 
-			int startIndex = camTexture.width*(int)(camTexture.height*0.25);
-			int length = camTexture.width*(int)(camTexture.height*0.50);
+
+			int scanWidth = rectWidth;
+			int scanHeight = rectHeight;
+
+			int length = scanWidth*scanHeight;
+
+//			int scanWidth = (int)(Screen.width*0.50);
+//			int scanHeight = (int)(Screen.height*0.50);
+
+
+
+			int startIndex = (int)((camTexture.width*0.5)-scanWidth*0.5);//how far into the image the scanner will start
+//			int startIndex = camTexture.width*(int)(camTexture.height*0.25) + (int)(Screen.width*0.25);
+
 //			int startIndex = 0;
 //			int length = Screen.width*Screen.height;
 
 			Color32[] color32Pixels = new Color32[length];
+			Color32[] FullColor32Pixels = camTexture.GetPixels32();
 
+			//for every row of pixels to be scanned, copy that row from full pixel list to scan pixel list
+			for(int i = 0; i < scanHeight; i++){
+				Array.Copy(FullColor32Pixels, startIndex + (i * camTexture.width), color32Pixels, scanWidth*i, scanWidth);
+			}
 
-			Array.Copy(camTexture.GetPixels32(), startIndex, color32Pixels, 0, length);
-
-//			foreach( Color32 c in color32Pixels){
-//				Debug.Log(c);
-//				break;
-//			}
-//
-
-
+			//check for codes in frame segment
 			IBarcodeReader barcodeReader = new BarcodeReader ();
 
-			var result = barcodeReader.Decode(color32Pixels, camTexture.width , (int)(camTexture.height*0.5));
-//			var result = barcodeReader.Decode(camTexture.GetPixels32(), camTexture.width , camTexture.height);
+			var result = barcodeReader.Decode(color32Pixels, scanWidth , scanHeight);
+//			var result = barcodeReader.Decode(camTexture.GetPixels32(), camTexture.width , camTexture.height);//origional code, scans entire screen at the cost of severely reduced performance
 
 			if (result != null) {
 				QRData = result.Text;
 				Debug.Log("DECODED TEXT FROM QR: " + result.Text);
-//				CancelInvoke();
+//				CancelInvoke();//stops QRScan from running again once a code is found
 			}
 			else {
-				Debug.Log("NO CODE FOUND AT " + x + " + " + width + ", " + y + " + " + height);
+				Debug.Log("NO CODE FOUND.");
 			}
 		} catch(Exception ex) { Debug.LogWarning (ex.Message); }
 	}
