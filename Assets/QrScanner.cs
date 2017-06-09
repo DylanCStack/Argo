@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 using Vuforia;
@@ -38,13 +39,16 @@ public class QrScanner : MonoBehaviour {
 			if (result != null) {
 				QRData = result.Text;
 				Debug.Log("DECODED TEXT FROM QR: " + result.Text);
-			
+
+				////Display Text on Screen
+				GameObject DisplayLog = GameObject.Find("DisplayLog");
+				DisplayLog.GetComponent<Text>().text = QRData;
 
 				/////Assign VideoClip to VideoPLayer
 				GameObject ARScanner = GameObject.Find("ImageTarget");
 				VideoPlayer player = ARScanner.GetComponent<VideoPlayer>();
 				ARScanner.GetComponent<ImageTargetPlayAudio>().enabled = true;
-				player.url = result.Text;
+				player.url = QRData;
 				CancelInvoke();
 
 			}
