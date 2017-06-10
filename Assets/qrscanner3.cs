@@ -16,6 +16,9 @@ public class qrscanner3 : MonoBehaviour {
 	public RawImage Image;
 	public AudioSource Audio;
 	private float RestartTime;
+	private WebCamTexture camTexture;
+	private Rect screenRect;
+	private bool foundQR = false;
 
 	// Disable Screen Rotation on that screen
 	void Awake()
@@ -44,8 +47,26 @@ public class qrscanner3 : MonoBehaviour {
 			rect.sizeDelta = new Vector2(rect.sizeDelta.x, newHeight);
 
 			RestartTime = Time.realtimeSinceStartup;
+
 		};
+
+		screenRect = new Rect(0, 0, Screen.width, Screen.height);
+		camTexture = new WebCamTexture();
+		camTexture.requestedHeight = Screen.height; 
+		camTexture.requestedWidth = Screen.width;
+		if (camTexture != null) {
+			camTexture.Play();
+		}
 	}
+
+	void OnGUI () {
+		// drawing the camera on screen
+		if (!foundQR) {
+			
+			GUI.DrawTexture (screenRect, camTexture, ScaleMode.ScaleAndCrop);
+		}
+	}
+
 
 	/// <summary>
 	/// Start a scan and wait for the callback (wait 1s after a scan success to avoid scanning multiple time the same element)
@@ -73,6 +94,7 @@ public class qrscanner3 : MonoBehaviour {
 			if(player.url != barCodeValue) {
 				player.url = barCodeValue;
 			}
+					foundQR = true;
 
 			// Feedback
 			Audio.Play();
