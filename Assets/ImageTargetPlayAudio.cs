@@ -9,7 +9,7 @@ using Vuforia;
 public class ImageTargetPlayAudio : MonoBehaviour, ITrackableEventHandler {
 
 	private TrackableBehaviour mTrackableBehaviour;
-//	public AudioSource BirthdayAudio;
+	public AudioSource BirthdayAudio;
 	public VideoPlayer BirthdayVideo;
 
 
@@ -17,15 +17,15 @@ public class ImageTargetPlayAudio : MonoBehaviour, ITrackableEventHandler {
 	void Start()
 	{
 		mTrackableBehaviour = GetComponent<TrackableBehaviour>();
-//		BirthdayAudio = gameObject.AddComponent<AudioSource>();
+		BirthdayAudio = gameObject.AddComponent<AudioSource>();
 		BirthdayVideo = GetComponent<VideoPlayer>();
 
-//		BirthdayAudio.playOnAwake = false;
+		BirthdayAudio.playOnAwake = false;
 
-//		BirthdayVideo.audioOutputMode = VideoAudioOutputMode.AudioSource;
-//		BirthdayVideo.EnableAudioTrack (0, true);
-//		BirthdayVideo.SetTargetAudioSource (0, BirthdayAudio);
-//		BirthdayVideo.Prepare ();
+		BirthdayVideo.audioOutputMode = VideoAudioOutputMode.AudioSource;
+		BirthdayVideo.EnableAudioTrack (0, true);
+		BirthdayVideo.SetTargetAudioSource (0, BirthdayAudio);
+		BirthdayVideo.Prepare ();
 
 
 		if (mTrackableBehaviour)
@@ -48,7 +48,7 @@ public class ImageTargetPlayAudio : MonoBehaviour, ITrackableEventHandler {
 			newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
 		{
 			// Play audio when target is found
-//			BirthdayAudio.Play();
+			BirthdayAudio.Play();
 			BirthdayVideo.Play();
 
 		}
@@ -56,7 +56,7 @@ public class ImageTargetPlayAudio : MonoBehaviour, ITrackableEventHandler {
 		{
 			// Stop audio when target is lost
 			BirthdayVideo.Pause();
-//			BirthdayAudio.Pause();
+			BirthdayAudio.Pause();
 
 
 		}
