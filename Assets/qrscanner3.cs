@@ -43,28 +43,28 @@ public class qrscanner3 : MonoBehaviour {
 
 			// Keep Image Aspect Ratio
 			var rect = Image.GetComponent<RectTransform>();
-			var newHeight = rect.sizeDelta.x * BarcodeScanner.Camera.Height / BarcodeScanner.Camera.Width;
-			rect.sizeDelta = new Vector2(rect.sizeDelta.x, newHeight);
+			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
+			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
 
 			RestartTime = Time.realtimeSinceStartup;
 
 		};
 
-		screenRect = new Rect(0, 0, Screen.width, Screen.height);
-		camTexture = new WebCamTexture();
-		camTexture.requestedHeight = Screen.height; 
-		camTexture.requestedWidth = Screen.width;
-		if (camTexture != null) {
-			camTexture.Play();
-		}
+//		screenRect = new Rect(0, 0, Screen.width, Screen.height);
+//		camTexture = new WebCamTexture();
+//		camTexture.requestedHeight = Screen.height; 
+//		camTexture.requestedWidth = Screen.width;
+//		if (camTexture != null) {
+//			camTexture.Play();
+//		}
 	}
 
 	void OnGUI () {
 		// drawing the camera on screen
-		if (!foundQR) {
-			
-			GUI.DrawTexture (screenRect, camTexture, ScaleMode.ScaleAndCrop);
-		}
+//		if (!foundQR) {
+//			
+//			GUI.DrawTexture (screenRect, camTexture, ScaleMode.ScaleAndCrop);
+//		}
 	}
 
 
