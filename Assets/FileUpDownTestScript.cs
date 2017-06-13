@@ -13,12 +13,26 @@ public class FileUpDownTestScript : MonoBehaviour {
 //		Media = new WWW (url);
 //	}
 
-//	IEnumerator GetMedia(){
-//
-//
-//
-//
-//	}
+	private void GetTempPath(){
+		Debug.Log ("IS IT DOING SOMETHING>");
+
+
+		DirectoryInfo info = new DirectoryInfo(Application.temporaryCachePath);
+		Debug.Log (info);
+
+		if (info != null) {
+			File.WriteAllBytes(Application.temporaryCachePath + "/Message.mp4", Media.bytes);
+
+			var fileInfo = info.GetFiles ();
+			foreach (var file in fileInfo) {
+				Debug.Log (file);
+				Debug.Log ("YES, ITS DOING SOMETHING");
+			}
+		} else {
+			Debug.Log ("INCORRECT PATH");
+		}
+
+	}
 
 	void WWWStatus(){
 		Debug.Log ("Download Status\n" + "isDone: " + Media.isDone + "\n Progress: " + Media.progress + "\n bytesDownloaded: " + Media.bytesDownloaded);
@@ -36,12 +50,11 @@ public class FileUpDownTestScript : MonoBehaviour {
 
 		yield return Media;
 		Debug.Log ("Media loaded");
+		GetTempPath ();
 
 			
-//		var info = new DirectoryInfo(Application.temporaryCachePath);
-//		var fileInfo = info.GetFiles();
-//		foreach ( var file in fileInfo)  Debug.Log(file);
-//
+
+
 //
 //		Debug.Log (url);
 
