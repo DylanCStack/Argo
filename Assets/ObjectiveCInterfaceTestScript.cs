@@ -8,10 +8,10 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 
 	#if UNITY_IPHONE
 	[DllImport("__Internal")]
-	private static extern string _testMethod();
+	private static extern bool _getValue();
 	#endif
 
-	public string displayText = "false";
+	public string displayText = "FAILURE";
 
 	void Start () {
 		displayText = TestMethod ();
@@ -25,7 +25,9 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 	public static string TestMethod() {
 		#if UNITY_IPHONE
 		if (Application.platform == RuntimePlatform.IPhonePlayer) {
-			return _testMethod();
+		bool result = _getValue();
+		if (result)
+			return "SUCCESS";
 		}
 		#endif
 		return "did not work";

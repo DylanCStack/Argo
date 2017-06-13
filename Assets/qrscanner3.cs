@@ -83,8 +83,9 @@ public class qrscanner3 : MonoBehaviour {
 			RestartTime += Time.realtimeSinceStartup + 1f;
 
 			GameObject rawImage = GameObject.Find("RawImage");
-			rawImage.SetActive(false);
-
+			if(rawImage != null){
+				rawImage.SetActive(false);
+			}
 			GameObject arCamera = GameObject.Find("ARCamera");
 			arCamera.GetComponent<VuforiaBehaviour>().enabled = true;
 

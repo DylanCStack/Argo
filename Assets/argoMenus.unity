@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -1106,6 +1106,7 @@ GameObject:
   m_Component:
   - component: {fileID: 333972599}
   - component: {fileID: 333972598}
+  - component: {fileID: 333972600}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -1124,6 +1125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1542a18c960f4163b5536ddee9d9ac9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  displayText: false
 --- !u!4 &333972599
 Transform:
   m_ObjectHideFlags: 0
@@ -1138,6 +1140,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &333972600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 333972597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c48f8722315d40b7aa07af63b31cd5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  url: https://s3-us-west-2.amazonaws.com/eyecueargo/giveYouUp.mp4
 --- !u!1001 &334537441
 Prefab:
   m_ObjectHideFlags: 0
@@ -1641,7 +1655,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 225, y: -708.75}
+  m_AnchoredPosition: {x: 225, y: -708.7501}
   m_SizeDelta: {x: 250, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &406663390
@@ -3726,7 +3740,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -11.999992, y: -242}
+  m_AnchoredPosition: {x: -11.999992, y: -241.99998}
   m_SizeDelta: {x: -282, y: -842}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1037398768
@@ -6291,7 +6305,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 234, y: -226.16669}
+  m_AnchoredPosition: {x: 234, y: -226.16675}
   m_SizeDelta: {x: 468, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1862632851
