@@ -2,19 +2,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
+using Vuforia;
 
 public class FileUpDownTestScript : MonoBehaviour {
 
 	public string url;
+	public GameObject ImageTarget;
+	public GameObject ARCamera;
 
-	public WWW Media;
+	private WWW query;
+	private WWW Media;
 
 //	void Awake(){
 //		Media = new WWW (url);
 //	}
 
 	private void GetTempPath(){
-		Debug.Log ("IS IT DOING SOMETHING>");
+		Debug.Log ("IS IT DOING ANYTHING?");
 
 
 		DirectoryInfo info = new DirectoryInfo(Application.temporaryCachePath);
@@ -28,6 +33,7 @@ public class FileUpDownTestScript : MonoBehaviour {
 				Debug.Log (file);
 				Debug.Log ("YES, ITS DOING SOMETHING");
 			}
+			Debug.Log ("File written");
 		} else {
 			Debug.Log ("INCORRECT PATH");
 		}
@@ -41,24 +47,48 @@ public class FileUpDownTestScript : MonoBehaviour {
 		}
 	}
 
+	IEnumerator storeData(){
+		File.WriteAllBytes(Application.temporaryCachePath + "/Message.mp4", Media.bytes);
+		yield return null;
+	}
+
 	// Use this for initialization
 	IEnumerator Start () {
-		Debug.Log ("Media loading...");
+		Debug.Log ("Making query...");
 
-		Media = new WWW (url);
-//		InvokeRepeating ("WWWStatus", 0.5f, 0.5f);//monitor status of download of media object
+		query = new WWW (url);
 
+		yield return query;
+
+		Debug.Log ("Loading Media...");
+		Debug.Log (query.text);
+		Media = new WWW (query.text);
+//		Media = new WWW ("http://localhost:3000/media/1");
+		InvokeRepeating ("WWWStatus", 0.5f, 0.5f);//monitor status of download of media object
+//		GetTempPath ();
 		yield return Media;
-		Debug.Log ("Media loaded");
-		GetTempPath ();
 
-			
+		yield return storeData ();
+//		yield return new WaitUntil (()=> );
+//		yield return new WaitForSeconds(2f);
+
+		if (File.Exists (Application.temporaryCachePath + "/Message.mp4")) {
+
+			VideoPlayer player = ImageTarget.GetComponent<VideoPlayer> ();
+//		player.source = VideoClip;
+			player.url = Application.temporaryCachePath + "/Message.mp4";
+
+			ARCamera.GetComponent<VuforiaBehaviour> ().enabled = true;
+
+			ImageTarget.GetComponent<ImageTargetPlayAudio> ().enabled = true;
+			//https://s3-us-west-2.amazonaws.com/eyecueargo/giveYouUp.mp4
+			this.enabled = false;
+		}
 
 
 //
 //		Debug.Log (url);
 
-		//		File.WriteAllBytes(Application.temporaryCachePath + "/Message.mp4", Media.bytes);
 	}
 	
 	// Update is called once per frame
