@@ -68,7 +68,7 @@ public class FileUpDownTestScript : MonoBehaviour {
 //		GetTempPath ();
 		yield return Media;
 
-		yield return storeData ();
+		yield return StartCoroutine(storeData ());
 //		yield return new WaitUntil (()=> );
 //		yield return new WaitForSeconds(2f);
 
