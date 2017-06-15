@@ -10,6 +10,24 @@ var media = require('./routes/media');
 
 var app = express();
 
+// MySql Database setup
+var db = require('./db')
+// app.use('/comments', require('./controllers/comments'))
+// app.use('/media', require('./controllers/media.js'))
+
+// Connect to MySQL on start
+db.connect(db.MODE_PRODUCTION, function(err) {
+  if (err) {
+    console.log('Unable to connect to MySQL.')
+    process.exit(1)
+  } else {
+  //   app.listen(3000, function() {
+      console.log('Database connected.')
+      // console.log(db.get());
+  //   })
+  }
+})
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
