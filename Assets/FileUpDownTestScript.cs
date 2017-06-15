@@ -26,7 +26,7 @@ public class FileUpDownTestScript : MonoBehaviour {
 		Debug.Log (info);
 
 		if (info != null) {
-			File.WriteAllBytes(Application.temporaryCachePath + "/Message.mp4", Media.bytes);
+//			File.WriteAllBytes(Application.temporaryCachePath + "/Message.mp4", Media.bytes);
 
 			var fileInfo = info.GetFiles ();
 			foreach (var file in fileInfo) {
