@@ -10,3 +10,6 @@ Start MySQL server in MAMP
 in this directory run:
   $ npm install
   $ DEBUG=myapp:* npm start
+
+  $ touch secretKey.js
+    populate secretKey.js with the secret key

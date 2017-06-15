@@ -6,12 +6,13 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
+var users = require('./routes/users');
 var media = require('./routes/media');
 
 var app = express();
 
 // MySql Database setup
-var db = require('./db')
+var db = require('./db');
 // app.use('/comments', require('./controllers/comments'))
 // app.use('/media', require('./controllers/media.js'))
 
@@ -27,6 +28,16 @@ db.connect(db.MODE_PRODUCTION, function(err) {
   //   })
   }
 })
+// session management setup
+var session = require('client-sessions');
+var secretKey = require('secretKey');
+
+app.use(session({
+  cookieName: 'Argo_cookie',
+  secret: secretKey,
+  duration: 30 * 60 * 1000,
+  activeDuration: 5 * 60 * 1000,
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -42,6 +53,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/media', media);
+app.use('/user', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
