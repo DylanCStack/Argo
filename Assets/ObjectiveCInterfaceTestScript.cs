@@ -1,50 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
-using UnityEngine.UI;
-
 public class ObjectiveCInterfaceTestScript : MonoBehaviour {
-
-
-	#if UNITY_IOS     
-	[DllImport ("__Internal")]
-	private static extern string framework_hello();
-
-	[DllImport ("__Internal")]
-	private static extern void framework_ChooseExisting();
-
-	[DllImport ("__Internal")]
-	private static extern void _chooseExisting();
-
-	#endif      
-	public static string hello() {         
-		#if UNITY_IOS
-		if (Application.platform == RuntimePlatform.IPhonePlayer) {             
-			return framework_hello();
-		}
-		#endif  
-
-		return "nothin";
-	}     
-
-	public void chooseExisting() {
-		#if UNITY_IOS
-		if (Application.platform == RuntimePlatform.IPhonePlayer) {             
-//			framework_ChooseExisting();
-			_chooseExisting();
-		}
-		#endif  
-	}
-
-	public void recieveImagePath(string message) {
-		GameObject.Find("DisplayLog").GetComponent<Text>().text = message;
-	}
-	 
-
+	public Texture2D shareButtonImage; // Use this for initialization
+	[DllImport("__Internal")]
+	private static extern void OpenVideoPicker(string game_object_name, string function_name);
 	void Start () {
-
+		OpenVideoPicker ("RawImage", "VideoPicked");
 	}
+	// Update is called once per frame
+	void Update () {
+	}
+//	void OnGUI ()
+//	{
+//		if (GUILayout.Button (shareButtonImage, GUIStyle.none, GUILayout.Width (128), GUILayout.Height (128))) {
+//			OpenVideoPicker( "GameObject", "VideoPicked" );
+//		}
+//	}
 
-
-
+	void VideoPicked( string path ){
+		Debug.Log ("---->VideoPicked");
+		Debug.Log( path );
+	}
 }
