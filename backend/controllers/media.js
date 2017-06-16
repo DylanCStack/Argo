@@ -1,4 +1,4 @@
-var db = require('../db.js')
+var db = require('../db.js');
 
 exports.create = function(userId, text, done) {
   var values = [userId, text, new Date().toISOString()]

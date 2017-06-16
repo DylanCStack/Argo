@@ -30,7 +30,7 @@ db.connect(db.MODE_PRODUCTION, function(err) {
 })
 // session management setup
 var session = require('client-sessions');
-var secretKey = require('secretKey');
+var secretKey = require('./secretKey');
 
 app.use(session({
   cookieName: 'Argo_cookie',
