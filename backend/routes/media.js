@@ -13,4 +13,14 @@ router.get('/:id', function(req, res) {
   });
 });
 
+router.post('/upload', function(req, res) {
+  // res.send('You are trying to access media id: ' + req.params.id);
+  console.log(req.body);
+  mediaController.upload(req.body.url, req.body.privacy, req.body.recipient, function(err, rows){
+    if(err) return res.send(err);
+    res.send(rows[0]['url']);
+  });
+});
+
+
 module.exports = router;

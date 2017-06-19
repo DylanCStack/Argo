@@ -33,7 +33,7 @@ var session = require('client-sessions');
 var secretKey = require('./secretKey');
 
 app.use(session({
-  cookieName: 'Argo_cookie',
+  cookieName: 'session',
   secret: secretKey,
   duration: 30 * 60 * 1000,
   activeDuration: 5 * 60 * 1000,

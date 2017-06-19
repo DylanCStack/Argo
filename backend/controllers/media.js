@@ -1,9 +1,8 @@
 var db = require('../db.js');
 
-exports.create = function(userId, text, done) {
-  var values = [userId, text, new Date().toISOString()]
-
-  db.get().query('INSERT INTO comments (user_id, text, date) VALUES(?, ?, ?)', values, function(err, result) {
+exports.upload = function(url, privacy, recipient, done) {
+  var values = [url, privacy, recipient];
+  db.get().query('INSERT INTO media (url, privacy, recipient) VALUES(?, ?, ?)', values, function(err, result) {
     if (err) return done(err)
     done(null, result.insertId)
   })
