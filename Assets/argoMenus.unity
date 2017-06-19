@@ -1125,6 +1125,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shareButtonImage: {fileID: 0}
+  IdentityPoolId: us-west-2:bdbe6639-8a19-4315-b0ad-294039672635
+  CognitoIdentityRegion: us-west-2
+  S3Region: us-west-2
+  S3BucketName: eyecueargo
 --- !u!4 &333972599
 Transform:
   m_ObjectHideFlags: 0
@@ -1409,6 +1413,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shareButtonImage: {fileID: 0}
+  IdentityPoolId: us-west-2:bdbe6639-8a19-4315-b0ad-294039672635
+  CognitoIdentityRegion: us-west-2
+  S3Region: us-west-2
+  S3BucketName: eyecueargo
 --- !u!1 &373244279
 GameObject:
   m_ObjectHideFlags: 0
@@ -4354,11 +4362,11 @@ VideoPlayer:
   - {fileID: 1226792423}
   m_DirectAudioVolumes:
   - 1
-  m_Url: 
+  m_Url: https://s3-us-west-2.amazonaws.com/eyecueargo/privatevarmobileContainersDataApplication3A4DC238-6354-46E3-A6CE-D0055DCB9B68FA085FEC-CBDF-4A8A-A782-EFA7CFEBB49F.MOV
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 0
+  m_PlayOnAwake: 1
   m_SkipOnDrop: 1
   m_Looping: 1
   m_WaitForFirstFrame: 0
@@ -7363,7 +7371,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2104939285
 MonoBehaviour:
   m_ObjectHideFlags: 0
