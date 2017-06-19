@@ -37,3 +37,4 @@ sysinfo.txt
 
 #express backend
 /backend/node_modules
+/backend/secretKey.js
