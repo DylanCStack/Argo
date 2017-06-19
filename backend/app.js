@@ -35,9 +35,30 @@ var secretKey = require('./secretKey');
 app.use(session({
   cookieName: 'session',
   secret: secretKey,
-  duration: 30 * 60 * 1000,
+  duration: 365 * 24 * 60 * 60 * 1000,//user will stay logged in for 1 year.
   activeDuration: 5 * 60 * 1000,
 }));
+var userController = require("./controllers/users");
+app.use(function(req, res, next) {//checks if the user has a valid session
+  // return res.send(req);
+  // console.log(req);
+
+  if (req.session && req.session.user) {//if session and user exist
+    console.log("SESSION EXISTS");
+    userController.findByPhone({ phone: req.session.user.phone }, function(err, user) {
+      if (user) {
+        req.user = user;//check this to see if user is logged in
+        // delete req.user.password; // delete the password from the session
+        req.session.user = user;  //refresh the session value
+        res.locals.user = user;
+      }
+      // finishing processing the middleware and run the route
+      next();
+    });
+  } else {
+    next();
+  }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

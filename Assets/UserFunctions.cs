@@ -43,7 +43,11 @@ public class UserFunctions : MonoBehaviour {
 		form.AddField("phone", phone.text);
 		form.AddField ("email", email.text);
 		form.AddField("password", password.text);
-		WWW loginRequest = new WWW("localhost:3000/user/login", form);
+
+		Dictionary<string, string> headers = form.headers;
+		headers ["cookie"] = PlayerPrefs.GetString ("cookie");
+
+		WWW loginRequest = new WWW("localhost:3000/user/login", form.data, headers);
 		yield return loginRequest;//wait for json response.
 
 		var response = JSON.Parse(loginRequest.text);
@@ -56,9 +60,16 @@ public class UserFunctions : MonoBehaviour {
 		} else if (!response["login"].AsBool){
 			alerts.text = "Invalid phone number or password.";
 		} else if(response["login"].AsBool){
-			string cookie = loginRequest.responseHeaders ["SET-COOKIE"].Substring (8);//gets cookie data to be set
+			Debug.Log (loginRequest.text);
 
-			PlayerPrefs.SetString ("cookie", cookie);
+
+			if (loginRequest.responseHeaders.ContainsKey("SET-COOKIE")) {
+				Debug.Log ("SETTING NEW KEY");
+				string cookie = loginRequest.responseHeaders ["SET-COOKIE"];//.Substring (8);//gets cookie data to be set
+//			string cookie = loginRequest.responseHeaders ["SET-COOKIE"] || loginRequest.responseHeaders[""];//gets cookie data to be set
+
+				PlayerPrefs.SetString ("cookie", cookie);
+			}
 			Debug.Log (PlayerPrefs.GetString("cookie"));
 
 			alerts.text = "Successfully logged in. Welcome Back.";

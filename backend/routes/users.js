@@ -34,25 +34,35 @@ router.post('/login', function(req, res) {
 
 
     if(user){
-      req.session.user = user;//session cookie set
+      console.log("COOKIE SET");
+      req.user = user;
+      delete req.user.password; // delete the password from the session
+      req.session.user = user;  //refresh the session value
+      res.locals.user = user;
+
       return res.json({"login": true, "error": false})//successful login
     } else {
       return res.json({"login": false, "error":false})//unsuccessful login
     }
   })
-  // User.findOne({ email: req.body.email }, function(err, user) {
-  //   if (!user) {
-  //     res.render('login.jade', { error: 'Invalid email or password.' });
-  //   } else {
-  //     if (req.body.password === user.password) {
-  //       // sets a cookie with the user's info
-  //       req.session.user = user;
-  //       res.redirect('/dashboard');
-  //     } else {
-  //       res.render('login.jade', { error: 'Invalid email or password.' });
-  //     }
-  //   }
-  // });
+});
+router.get('/login/:phone/:email/:pass', function(req, res) {
+  return userController.login(req.params.phone, req.params.email, req.params.pass, function(err, user){
+    if(err) return res.json({"login":false, "error": err});//error logging in
+
+
+    if(user){
+      console.log("COOKIE SET");
+      req.user = user;
+      delete req.user.password; // delete the password from the session
+      req.session.user = user;  //refresh the session value
+      res.locals.user = user;
+
+      return res.json({"login": true, "error": false})//successful login
+    } else {
+      return res.json({"login": false, "error":false})//unsuccessful login
+    }
+  })
 });
 
 //login
