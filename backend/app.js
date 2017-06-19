@@ -44,11 +44,12 @@ app.use(function(req, res, next) {//checks if the user has a valid session
   // console.log(req);
 
   if (req.session && req.session.user) {//if session and user exist
+    //in http request this checks key:'cookie':'session=***'
     console.log("SESSION EXISTS");
     userController.findByPhone({ phone: req.session.user.phone }, function(err, user) {
       if (user) {
         req.user = user;//check this to see if user is logged in
-        // delete req.user.password; // delete the password from the session
+        delete req.user.password; // delete the password from the session
         req.session.user = user;  //refresh the session value
         res.locals.user = user;
       }
