@@ -30,11 +30,11 @@ exports.register = function(phone, email, pass, done){
 exports.login = function(phone, email, pass, done){
   var query = {"phone": phone};
 
-  if (email !== null){query['email'] = email; console.log(query);}
+  if (email !== null){query['email'] = email;}
 
   db.get().query("SELECT * FROM users WHERE ?;", {"phone": phone}, function(err, results){
-    console.log("results");
-    console.log(results);
+    // console.log("results");
+    // console.log(results);
     if(err) return done(err, null);//error in login
 
     if(results[0] !== undefined){
@@ -44,5 +44,17 @@ exports.login = function(phone, email, pass, done){
     }
 
 
+  })
+}
+exports.findByPhone = function(phone, done){
+  db.get().query("SELECT ALL FROM users WHERE ?;", {"phone":phone}, function(err, results){
+    if(err) return done(err);
+
+    if(results[0] !== undefined){
+      //user is logged in
+      return done(null,results[0])
+    } else {
+      return done(null, null);
+    }
   })
 }
