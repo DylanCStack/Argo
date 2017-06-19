@@ -56,7 +56,10 @@ public class UserFunctions : MonoBehaviour {
 		} else if (!response["login"].AsBool){
 			alerts.text = "Invalid phone number or password.";
 		} else if(response["login"].AsBool){
-			Debug.Log (loginRequest.responseHeaders ["SET-COOKIE"].Substring(8));//gets cookie data to be set
+			string cookie = loginRequest.responseHeaders ["SET-COOKIE"].Substring (8);//gets cookie data to be set
+
+			PlayerPrefs.SetString ("cookie", cookie);
+			Debug.Log (PlayerPrefs.GetString("cookie"));
 
 			alerts.text = "Successfully logged in. Welcome Back.";
 		}
