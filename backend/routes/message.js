@@ -23,7 +23,7 @@ router.get('/:id', function(req, res) {
   });
 });
 
-router.post('/upload', requireLogin,  function(req, res) {
+router.post('/upload', function(req, res) {
   // res.send('You are trying to access message id: ' + req.params.id);
   console.log(req.body);
   messageController.upload(req.body.url, req.body.privacy, req.body.recipient, function(err, rows){
