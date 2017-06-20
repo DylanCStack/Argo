@@ -42,18 +42,18 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 	}
 	public string S3BucketName = "arn:aws:s3:::eyecueargo";
 	private IAmazonS3 _s3Client;
-	private AWSCredentials _credentials;
+	private BasicAWSCredentials Credentials = new BasicAWSCredentials("AKIAJQZXKUPR47AXETNA","GFyHFW/vjbGpV7Ek4Fr6A79UoitF0m0DCZmlCifc");
 
-	//AWSCredential constructor
-	private AWSCredentials Credentials
-	{
-		get
-		{
-			if (_credentials == null)
-				_credentials = new CognitoAWSCredentials(IdentityPoolId, RegionEndpoint.USWest2);
-			return _credentials;
-		}
-	}
+//	//AWSCredential constructor
+//	private AWSCredentials Credentials
+//	{
+//		get
+//		{
+//			if (_credentials == null)
+//				_credentials = new CognitoAWSCredentials(IdentityPoolId, RegionEndpoint.USWest2);
+//			return _credentials;
+//		}
+//	}
 
 	//Client constructor
 	private IAmazonS3 Client
@@ -74,20 +74,26 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 	void Start () {//initialize AWS and open videopicker
 
 		UnityInitializer.AttachToGameObject(this.gameObject);
-//		OpenVideoPicker ("TestObject", "VideoPicked");
-		PostObject("Assets/birthday.webm");
+		OpenVideoPicker ("TestObject", "VideoPicked");
+//		Debug.Log(SystemInfo.deviceUniqueIdentifier);
+//		PostObject("Assets/birthday.webm");
+//		GetObject();
+//		GetObjects();
+
 
 	}
 
 	//Post a video to S3
 	public void PostObject(string filePath)
 	{
-
+		
 		//Adjust file name to be more readable
 		string fileName = filePath.Replace ("/", "");
 		string fileName2 = fileName.Replace ("tmptrim.", "");
 		string fileName3 = fileName2.Replace (".MOV", ".mov");
 		string fileName4 = fileName3.Replace("privatevarmobileContainersDataApplication", "");
+		string fileName5 = fileName4.Substring (fileName4.Length - 12);
+		string fileName6 = SystemInfo.deviceUniqueIdentifier + "-" + fileName5;
 
 		//prepare file for upload
 		var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -98,7 +104,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 			Bucket = S3BucketName,
 			Key = fileName4,
 			InputStream = stream,
-			CannedACL = S3CannedACL.PublicRead,
+			CannedACL = S3CannedACL.Private,
 			Region = _S3Region
 		};
 				
@@ -113,10 +119,13 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 				else
 				{//did not post
 					Debug.Log("\nException while posting the result object");
-					Debug.Log(responseObj.Exception.InnerException);
+					Debug.Log(responseObj.Exception.Message);
+					Debug.Log(responseObj.Exception.Source);
+
 				}
 			});
 	}
+		
 
 
 	//collect returned information from iOS plugin
@@ -135,6 +144,53 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 		//Post video to S3
 		PostObject (newPath);
 
+	}
+
+
+	private void GetObject()
+	{
+		Debug.Log( string.Format("fetching {0} from bucket {1}", "poop2", S3BucketName));
+		Client.GetObjectAsync(S3BucketName, "poop2", (responseObj) =>
+			{
+				string data = null;
+				var response = responseObj.Response;
+				if (response.ResponseStream != null)
+				{
+					using (StreamReader reader = new StreamReader(response.ResponseStream))
+					{
+						data = reader.ReadToEnd();
+					}
+
+					Debug.Log(data);
+				}
+			});
+	}
+
+	public void GetObjects()
+	{
+		Debug.Log( "Fetching all the Objects from " + S3BucketName);
+
+		var request = new ListObjectsRequest()
+		{
+			BucketName = S3BucketName
+		};
+
+		Client.ListObjectsAsync(request, (responseObject) =>
+			{
+				Debug.Log( "\n");
+				if (responseObject.Exception == null)
+				{
+					Debug.Log("Got Response \nPrinting now \n");
+					responseObject.Response.S3Objects.ForEach((o) =>
+						{
+							Debug.Log( string.Format("{0}\n", o.Key));
+						});
+				}
+				else
+				{
+					Debug.Log("Got Exception \n");
+				}
+			});
 	}
 			
 
