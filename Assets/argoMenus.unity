@@ -521,14 +521,12 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 188470365}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cf2c835acb714e07af84e989c11a218, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TextHeader: {fileID: 1113790287}
   Image: {fileID: 1072821875}
-  Audio: {fileID: 0}
 --- !u!1 &199593491
 GameObject:
   m_ObjectHideFlags: 0
@@ -1125,7 +1123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1542a18c960f4163b5536ddee9d9ac9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shareButtonImage: {fileID: 0}
   IdentityPoolId: us-west-2:bdbe6639-8a19-4315-b0ad-294039672635
   CognitoIdentityRegion: us-west-2
   S3Region: us-west-2
@@ -1202,7 +1199,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400006, guid: bf30d577eead1ef40bcf2b404289daf4, type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: bf30d577eead1ef40bcf2b404289daf4, type: 2}
@@ -1427,7 +1424,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1542a18c960f4163b5536ddee9d9ac9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shareButtonImage: {fileID: 0}
   IdentityPoolId: us-west-2:bdbe6639-8a19-4315-b0ad-294039672635
   CognitoIdentityRegion: us-west-2
   S3Region: us-west-2
@@ -3727,7 +3723,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1072821875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4377,7 +4373,7 @@ VideoPlayer:
   - {fileID: 1226792423}
   m_DirectAudioVolumes:
   - 1
-  m_Url: https://s3-us-west-2.amazonaws.com/eyecueargo/hello.mov
+  m_Url: 
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1

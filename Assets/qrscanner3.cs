@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using Vuforia;
@@ -12,9 +11,7 @@ using Vuforia;
 public class qrscanner3 : MonoBehaviour {
 
 	private IScanner BarcodeScanner;
-	public Text TextHeader;
 	public RawImage Image;
-	public AudioSource Audio;
 	private float RestartTime;
 	private WebCamTexture camTexture;
 	private Rect screenRect;
@@ -49,25 +46,8 @@ public class qrscanner3 : MonoBehaviour {
 			RestartTime = Time.realtimeSinceStartup;
 
 		};
-
-//		screenRect = new Rect(0, 0, Screen.width, Screen.height);
-//		camTexture = new WebCamTexture();
-//		camTexture.requestedHeight = Screen.height; 
-//		camTexture.requestedWidth = Screen.width;
-//		if (camTexture != null) {
-//			camTexture.Play();
-//		}
 	}
-
-	void OnGUI () {
-		// drawing the camera on screen
-//		if (!foundQR) {
-//			
-//			GUI.DrawTexture (screenRect, camTexture, ScaleMode.ScaleAndCrop);
-//		}
-	}
-
-
+		
 	/// <summary>
 	/// Start a scan and wait for the callback (wait 1s after a scan success to avoid scanning multiple time the same element)
 	/// </summary>
@@ -75,30 +55,32 @@ public class qrscanner3 : MonoBehaviour {
 	{
 		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
 			BarcodeScanner.Stop();
-			if (TextHeader.text.Length > 250)
-			{
-				TextHeader.text = "";
-			}
-			TextHeader.text += "Found: " + barCodeType + " / " + barCodeValue + "\n";
+
 			RestartTime += Time.realtimeSinceStartup + 1f;
 
-			GameObject rawImage = GameObject.Find("RawImage");
-			if(rawImage != null){
-				rawImage.SetActive(false);
+			//turn off raw image displaying camera texture
+			if(Image != null){
+				Image.enabled = false;
 			}
+
+			//enable vuforia camera so it can track objects
 			GameObject arCamera = GameObject.Find("ARCamera");
 			arCamera.GetComponent<VuforiaBehaviour>().enabled = true;
 
+			//enable the image target so vuforia knows what to track
 			GameObject ARScanner = GameObject.Find("ImageTarget");
+
+			//enable the video player on the image target
 			VideoPlayer player = ARScanner.GetComponent<VideoPlayer>();
 			ARScanner.GetComponent<ImageTargetPlayAudio>().enabled = true;
+
+			//set video url to value of qr code
 			if(player.url != barCodeValue) {
 				player.url = barCodeValue;
 			}
-					foundQR = true;
+			foundQR = true;
 
 			// Feedback
-			Audio.Play();
 
 			#if UNITY_ANDROID || UNITY_IOS
 			Handheld.Vibrate();
@@ -123,35 +105,5 @@ public class qrscanner3 : MonoBehaviour {
 			RestartTime = 0;
 		}
 	}
-
-	#region UI Buttons
-
-	public void ClickBack()
-	{
-		// Try to stop the camera before loading another scene
-		StartCoroutine(StopCamera(() => {
-			SceneManager.LoadScene("Boot");
-		}));
-	}
-
-	/// <summary>
-	/// This coroutine is used because of a bug with unity (http://forum.unity3d.com/threads/closing-scene-with-active-webcamtexture-crashes-on-android-solved.363566/)
-	/// Trying to stop the camera in OnDestroy provoke random crash on Android
-	/// </summary>
-	/// <param name="callback"></param>
-	/// <returns></returns>
-	public IEnumerator StopCamera(Action callback)
-	{
-		// Stop Scanning
-		Image = null;
-		BarcodeScanner.Destroy();
-		BarcodeScanner = null;
-
-		// Wait a bit
-		yield return new WaitForSeconds(0.1f);
-
-		callback.Invoke();
-	}
-
-	#endregion
+		
 }
