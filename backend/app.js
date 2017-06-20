@@ -7,23 +7,21 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var media = require('./routes/media');
+var message = require('./routes/message');
 
 var app = express();
 
 // MySql Database setup
 var db = require('./db');
-// app.use('/comments', require('./controllers/comments'))
-// app.use('/media', require('./controllers/media.js'))
 
 // Connect to MySQL on start
 db.connect(db.MODE_PRODUCTION, function(err) {
   if (err) {
-    console.log('Unable to connect to MySQL.')
+    console.log('Unable to connect to MySQL.');
     process.exit(1)
   } else {
   //   app.listen(3000, function() {
-      console.log('Database connected.')
+      console.log('Database connected.');
       // console.log(db.get());
   //   })
   }
@@ -74,7 +72,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/media', media);
+app.use('/message', message);
 app.use('/user', users);
 
 // catch 404 and forward to error handler
