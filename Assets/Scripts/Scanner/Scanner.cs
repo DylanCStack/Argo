@@ -72,6 +72,7 @@ namespace BarcodeScanner.Scanner
 			Camera = (webcam == null) ? new UnityWebcam(Settings): webcam;
 		}
 
+		bool forceStopScanning = true;
 		/// <summary>
 		/// Used to start Scanning
 		/// </summary>
@@ -91,6 +92,7 @@ namespace BarcodeScanner.Scanner
 			#if !UNITY_WEBGL
 			if (Settings.ScannerBackgroundThread)
 			{
+				forceStopScanning = false;
 				CodeScannerThread = new Thread(ThreadDecodeQR);
 				CodeScannerThread.Start();
 			}
@@ -121,7 +123,8 @@ namespace BarcodeScanner.Scanner
 			#if !UNITY_WEBGL
 			if (CodeScannerThread != null)
 			{
-				CodeScannerThread.Abort();
+				forceStopScanning = true;
+				CodeScannerThread.Join();
 			}
 			#endif
 
@@ -193,7 +196,7 @@ namespace BarcodeScanner.Scanner
 		/// </summary>
 		public void ThreadDecodeQR()
 		{
-			while (Result == null)
+			while (forceStopScanning == false && Result == null)
 			{
 				// Wait
 				if (Status != ScannerStatus.Running || !parserPixelAvailable || Camera.Width == 0)
@@ -209,8 +212,10 @@ namespace BarcodeScanner.Scanner
 					Result = Parser.Decode(pixels, Camera.Width, Camera.Height);
 					parserPixelAvailable = false;
 
-					// Sleep a little bit and set the signal to get the next frame
-					Thread.Sleep(Mathf.FloorToInt(Settings.ScannerDecodeInterval * 1000));
+					if (Result == null) {
+						// Sleep a little bit and set the signal to get the next frame
+						Thread.Sleep(Mathf.FloorToInt(Settings.ScannerDecodeInterval * 1000));
+					}
 				}
 				catch (Exception e)
 				{

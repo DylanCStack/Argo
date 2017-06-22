@@ -18,7 +18,7 @@ router.post('/upload', function(req, res) {
   console.log(req.body);
   mediaController.upload(req.body.url, req.body.privacy, req.body.recipient, function(err, rows){
     if(err) return res.send(err);
-    res.send(rows[0]['url']);
+    res.json(rows);
   });
 });
 
