@@ -19,7 +19,12 @@ public class ReloadScene : MonoBehaviour {
 	}
 
 	public void reloadScene () {
-		GameObject.Find ("ARCamera").SetActive(false);
+		if (GameObject.Find ("ARCamera")) {
+//			Destroy(GameObject.Find ("ARCamera"));
+		}
+		if (GameObject.Find ("TestObject")) {
+//			Destroy (GameObject.Find ("TestObject"));
+		}
 		SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex);
 
 	}

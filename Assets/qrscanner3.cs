@@ -30,10 +30,7 @@ public class qrscanner3 : MonoBehaviour {
 	public static string _qrid;
 	private string videoName;
 	private string currentVideoName;
-	/////////////////////////////////////////////////////////////////iOS PLUGIN AND AMAZON COMMUNICATIONS
-
-
-
+	/////////////////////////////////////////////////////////////////SCANNER METHODS
 	// Disable Screen Rotation on that screen
 	void Awake()
 	{
@@ -42,10 +39,21 @@ public class qrscanner3 : MonoBehaviour {
 	}
 
 	void Start () {
-		//attach amazon stuff to this object
-		UnityInitializer.AttachToGameObject(this.gameObject);
-		GameObject.Find("DisplayLog").GetComponent<Text>().text = "started";
 
+
+	}
+		
+	void OnEnable() {
+
+		//attach amazon details
+		UnityInitializer.AttachToGameObject(this.gameObject);
+
+		//Destroy the old scanner when re-enabling
+		BarcodeScanner = null;
+		_qrid = null;
+		BarcodeScanner = new Scanner ();
+		BarcodeScanner.Camera.Play();
+		Debug.Log("--------------------STARTED-FROM-UPDATE--------------------");
 		// Display the camera texture through a RawImage
 		BarcodeScanner.OnReady += (sender, arg) => {
 			// Set Orientation & Texture
@@ -59,32 +67,10 @@ public class qrscanner3 : MonoBehaviour {
 			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
 
 			RestartTime = Time.realtimeSinceStartup;
-
 		};
 
 	}
 		
-	void OnEnable() {
-
-		//Destroy the old scanner when re-enabling
-		BarcodeScanner = null;
-
-	}
-
-	private void StartScanner()
-	{
-		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
-			BarcodeScanner.Stop();
-			if(_qrid != barCodeValue) {
-				_qrid = barCodeValue;
-				GameObject.Find("DisplayLog").GetComponent<Text>().text = barCodeValue;
-				CoroutineWithData cd = new CoroutineWithData(this, checkURL(barCodeValue));
-			} else {
-
-			}
-			RestartTime += Time.realtimeSinceStartup + 1f;
-		});
-	}
 		
 	void Update()
 	{
@@ -94,23 +80,7 @@ public class qrscanner3 : MonoBehaviour {
 			BarcodeScanner.Update();
 		} else if (BarcodeScanner == null) {//when scanner has been destroyed create new one
 			
-			BarcodeScanner = new Scanner ();
-			BarcodeScanner.Camera.Play();
-			Debug.Log("--------------------STARTED-FROM-UPDATE--------------------");
-			// Display the camera texture through a RawImage
-			BarcodeScanner.OnReady += (sender, arg) => {
-				// Set Orientation & Texture
-				Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
-				Image.transform.localScale = BarcodeScanner.Camera.GetScale();
-				Image.texture = BarcodeScanner.Camera.Texture;
 
-				// Keep Image Aspect Ratio
-				var rect = Image.GetComponent<RectTransform>();
-				var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
-				rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
-
-				RestartTime = Time.realtimeSinceStartup;
-			};
 		}
 
 		// Check if the Scanner need to be started or restarted
@@ -121,6 +91,8 @@ public class qrscanner3 : MonoBehaviour {
 
 		}
 	}
+
+
 
 
 
@@ -144,6 +116,23 @@ public class qrscanner3 : MonoBehaviour {
 			StartVuforia ();
 
 		}
+	}
+
+
+	/////////////////////////////////SCANNER METHODS
+	private void StartScanner()
+	{
+		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
+			BarcodeScanner.Stop();
+			if(_qrid != barCodeValue) {
+				_qrid = barCodeValue;
+				GameObject.Find("DisplayLog").GetComponent<Text>().text = barCodeValue;
+				CoroutineWithData cd = new CoroutineWithData(this, checkURL(barCodeValue));
+			} else {
+
+			}
+			RestartTime += Time.realtimeSinceStartup + 1f;
+		});
 	}
 
 /////////////////////////////////iOS PLUGIN
@@ -303,7 +292,6 @@ public class qrscanner3 : MonoBehaviour {
 					StartCoroutine (
 						PostToArgoDB (videoName, "public", "noone")
 					);
-
 				}
 				else
 				{//did not post
