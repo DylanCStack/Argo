@@ -74,7 +74,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 	void Start () {//initialize AWS and open videopicker
 
 		UnityInitializer.AttachToGameObject(this.gameObject);
-		OpenVideoPicker ("TestObject", "VideoPicked");
+//		OpenVideoPicker ("TestObject", "VideoPicked");
 //		Debug.Log(SystemInfo.deviceUniqueIdentifier);
 //		PostObject("Assets/birthday.webm");
 //		GetObject();
