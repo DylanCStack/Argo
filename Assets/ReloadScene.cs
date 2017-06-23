@@ -19,17 +19,12 @@ public class ReloadScene : MonoBehaviour {
 	}
 
 	public void reloadScene () {
-		GameObject.Find ("ARCamera").GetComponent<VuforiaBehaviour> ().enabled = false;
+		GameObject.Find ("ARCamera").SetActive(false);
 		GameObject ARScanner = GameObject.Find("ImageTarget");
-		GameObject.Find ("Camera").SetActive (false);
+//		GameObject.Find ("Camera").SetActive (false);
 		//enable the video player on the image target
 		VideoPlayer player = ARScanner.GetComponent<VideoPlayer>();
 		ARScanner.GetComponent<ImageTargetPlayAudio>().enabled = false;
-
-
-
-		GameObject.Find ("ARCamera").GetComponent<qrscanner3> ().enabled = false;
-		GameObject.Find ("ARCamera").GetComponent<qrscanner3> ().enabled = true;
 		FindObject(GameObject.Find ("HomeScreenPanel"), "RawImage").SetActive(true);
 		GameObject.Find ("RawImage").GetComponent<RawImage> ().enabled = false;
 		GameObject.Find ("RawImage").GetComponent<RawImage> ().enabled = true;

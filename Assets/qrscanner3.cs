@@ -139,13 +139,14 @@ public class qrscanner3 : MonoBehaviour {
 		
 	void OnEnable() {
 
+		GameObject.Find("DisplayLog").GetComponent<Text>().text = "started";
 //		_qrid = "";
 //		videoURL = "";
 //		currentVideoName = "";
 //
 //		BarcodeScanner.Stop ();
-//		BarcodeScanner.Camera.Play();
-//		Debug.Log(BarcodeScanner.Camera);
+		BarcodeScanner.Camera.Play();
+		Debug.Log(BarcodeScanner.Camera);
 //		GameObject.Find("DisplayLog").GetComponent<Text>().text = "";
 //		FindObject(GameObject.Find ("HomeScreenPanel"), "RawImage").SetActive(true);
 //		GameObject.Find ("RawImage").GetComponent<RawImage> ().enabled = false;
@@ -445,6 +446,7 @@ public class qrscanner3 : MonoBehaviour {
 
 	public void StartVuforia() {
 		//enable vuforia camera so it can track objects
+		FindObject(this.collider.transform.root.gameObject,"ARCamera");
 		GameObject arCamera = GameObject.Find("ARCamera");
 		arCamera.GetComponent<VuforiaBehaviour>().enabled = true;
 		GameObject camera = FindObject (arCamera, "Camera");

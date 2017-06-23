@@ -562,7 +562,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 188470365}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cf2c835acb714e07af84e989c11a218, type: 3}
   m_Name: 
@@ -1150,6 +1150,7 @@ GameObject:
   - component: {fileID: 333972599}
   - component: {fileID: 333972598}
   - component: {fileID: 333972600}
+  - component: {fileID: 333972601}
   m_Layer: 0
   m_Name: TestObject
   m_TagString: Untagged
@@ -1195,6 +1196,22 @@ MonoBehaviour:
   url: https://s3-us-west-2.amazonaws.com/eyecueargo/giveYouUp.mp4
   ImageTarget: {fileID: 0}
   ARCamera: {fileID: 0}
+--- !u!114 &333972601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 333972597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf2c835acb714e07af84e989c11a218, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Image: {fileID: 0}
+  IdentityPoolId: us-west-2:bdbe6639-8a19-4315-b0ad-294039672635
+  CognitoIdentityRegion: us-west-2
+  S3Region: us-west-2
+  S3BucketName: eyecueargo
 --- !u!1001 &334537441
 Prefab:
   m_ObjectHideFlags: 0
@@ -1236,7 +1253,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: bf30d577eead1ef40bcf2b404289daf4, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400006, guid: bf30d577eead1ef40bcf2b404289daf4, type: 2}
       propertyPath: m_Enabled

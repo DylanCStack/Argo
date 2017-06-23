@@ -4,6 +4,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 using Vuforia;
 
 public class ImageTargetPlayAudio : MonoBehaviour, ITrackableEventHandler {
