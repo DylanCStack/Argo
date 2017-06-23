@@ -20,14 +20,7 @@ public class ReloadScene : MonoBehaviour {
 
 	public void reloadScene () {
 		GameObject.Find ("ARCamera").SetActive(false);
-		GameObject ARScanner = GameObject.Find("ImageTarget");
-//		GameObject.Find ("Camera").SetActive (false);
-		//enable the video player on the image target
-		VideoPlayer player = ARScanner.GetComponent<VideoPlayer>();
-		ARScanner.GetComponent<ImageTargetPlayAudio>().enabled = false;
-		FindObject(GameObject.Find ("HomeScreenPanel"), "RawImage").SetActive(true);
-		GameObject.Find ("RawImage").GetComponent<RawImage> ().enabled = false;
-		GameObject.Find ("RawImage").GetComponent<RawImage> ().enabled = true;
+		SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex);
 
 	}
 

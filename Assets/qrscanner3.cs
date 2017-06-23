@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using UnityEngine.SceneManagement;
 using Vuforia;
 using System.Runtime.InteropServices;
 using System.IO;
@@ -45,7 +46,7 @@ public class qrscanner3 : MonoBehaviour {
 	private WebCamTexture camTexture;
 	private Rect screenRect;
 	private bool foundQR = false;
-	private string _qrid;
+	public static string _qrid;
 	private string videoURL;
 	private string currentVideoName;
 	/////////////////////////////////////////////////////////////////iOS PLUGIN AND AMAZON COMMUNICATIONS
@@ -107,19 +108,19 @@ public class qrscanner3 : MonoBehaviour {
 	}
 
 	void Start () {
-		
 		//attach amazon stuff to this object
 		UnityInitializer.AttachToGameObject(this.gameObject);
-//		PostObject ("Assets/birthday.webm");
-//		GetObjects();
-//		GetBucketList();
+		//		PostObject ("Assets/birthday.webm");
+		//		GetObjects();
+		//		GetBucketList();
 		GameObject.Find("DisplayLog").GetComponent<Text>().text = "started";
 
 		// Create a basic scanner
-		BarcodeScanner = new Scanner();
-		BarcodeScanner.Camera.Play();
-		Debug.Log(BarcodeScanner.Camera);
-
+		//		BarcodeScanner = new Scanner();
+		//		BarcodeScanner.Camera.Play();
+		Debug.Log("--------------------STARTED--------------------");
+		Debug.Log("--------------------SCANNER--------------------");
+		Debug.Log (BarcodeScanner.ToString());
 		// Display the camera texture through a RawImage
 		BarcodeScanner.OnReady += (sender, arg) => {
 			// Set Orientation & Texture
@@ -133,41 +134,19 @@ public class qrscanner3 : MonoBehaviour {
 			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
 
 			RestartTime = Time.realtimeSinceStartup;
+			Debug.Log("--------------------RESTART-TIME--------------------");
+			Debug.Log(RestartTime);
+			Debug.Log("--------------------REAL-TIME-SINCE-STARTUP--------------------");
+			Debug.Log(Time.realtimeSinceStartup);
 
 		};
+
 	}
 		
 	void OnEnable() {
 
-		GameObject.Find("DisplayLog").GetComponent<Text>().text = "started";
-//		_qrid = "";
-//		videoURL = "";
-//		currentVideoName = "";
-//
-//		BarcodeScanner.Stop ();
-		BarcodeScanner.Camera.Play();
-		Debug.Log(BarcodeScanner.Camera);
-//		GameObject.Find("DisplayLog").GetComponent<Text>().text = "";
-//		FindObject(GameObject.Find ("HomeScreenPanel"), "RawImage").SetActive(true);
-//		GameObject.Find ("RawImage").GetComponent<RawImage> ().enabled = false;
-//		Image = GameObject.Find ("RawImage").GetComponent<RawImage> ();
-//
-//		// Display the camera texture through a RawImage
-//		BarcodeScanner.OnReady += (sender, arg) => {
-//			// Set Orientation & Texture
-//			Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
-//			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
-//			Image.texture = BarcodeScanner.Camera.Texture;
-//
-//			// Keep Image Aspect Ratio
-//			var rect = Image.GetComponent<RectTransform>();
-//			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
-//			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
-//
-//			RestartTime = 0;
-//
-//		};
-//		StartScanner ();
+		BarcodeScanner = null;
+
 
 	}
 	/// <summary>
@@ -201,6 +180,30 @@ public class qrscanner3 : MonoBehaviour {
 		{
 
 			BarcodeScanner.Update();
+		}
+
+		if (BarcodeScanner == null) {
+			BarcodeScanner = new Scanner ();
+			BarcodeScanner.Camera.Play();
+			Debug.Log("--------------------STARTED-FROM-UPDATE--------------------");
+
+			// Display the camera texture through a RawImage
+			BarcodeScanner.OnReady += (sender, arg) => {
+				// Set Orientation & Texture
+				Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
+				Image.transform.localScale = BarcodeScanner.Camera.GetScale();
+				Image.texture = BarcodeScanner.Camera.Texture;
+
+				// Keep Image Aspect Ratio
+				var rect = Image.GetComponent<RectTransform>();
+				var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
+				rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
+
+				RestartTime = Time.realtimeSinceStartup;
+
+
+
+			};
 		}
 
 		// Check if the Scanner need to be started or restarted
@@ -239,9 +242,6 @@ public class qrscanner3 : MonoBehaviour {
 		} else {//set video to returned url
 
 			//turn off raw image displaying camera texture
-			if(Image != null){
-				Image.enabled = false;
-			}
 
 			videoURL = cd.result.ToString();
 			StartVuforia ();
@@ -273,7 +273,8 @@ public class qrscanner3 : MonoBehaviour {
 //		GameObject.Find("DisplayLog").GetComponent<Text>().text = "opened video picker";
 		Debug.Log (_qrid + "from 240");
 		PlayerPrefs.SetString ("qrid", _qrid);
-		OpenVideoPicker ("ARCamera", "VideoPicked");
+		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
+		OpenVideoPicker ("TestObject", "VideoPicked");
 	}
 
 	//Post a video to S3
@@ -410,11 +411,12 @@ public class qrscanner3 : MonoBehaviour {
 		testForm.AddField ("url", filename);
 		testForm.AddField ("privacy", privacy);
 		testForm.AddField ("recipient", recipient);
-		testForm.AddField ("qrid",GameObject.Find("DisplayLog").GetComponent<Text>().text);
+		testForm.AddField ("qrid",_qrid);
 		WWW request = new WWW("https://argo-server.herokuapp.com/message/upload", testForm);
 //		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = "waiting for text to return " + filename;
 		yield return request;
 		Debug.Log(request.text);
+		GameObject.Find ("LoadingPanel").SetActive(false);
 		StartVuforia();
 
 //		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = request.text;
@@ -446,8 +448,8 @@ public class qrscanner3 : MonoBehaviour {
 
 	public void StartVuforia() {
 		//enable vuforia camera so it can track objects
-		FindObject(this.collider.transform.root.gameObject,"ARCamera");
-		GameObject arCamera = GameObject.Find("ARCamera");
+		GameObject arCamera = FindRootObject("ARCamera");
+		arCamera.SetActive (true);
 		arCamera.GetComponent<VuforiaBehaviour>().enabled = true;
 		GameObject camera = FindObject (arCamera, "Camera");
 		camera.SetActive (true);
@@ -475,6 +477,19 @@ public class qrscanner3 : MonoBehaviour {
 	{
 		Component[] trs= parent.GetComponentsInChildren(typeof(Transform), true);
 		foreach(Component t in trs){
+			if(t.name == name){
+				return t.gameObject;
+			}
+		}
+		return null;
+	}
+
+	GameObject FindRootObject(string name)
+	{
+		List<GameObject> rootObjects = new List<GameObject>();
+		Scene scene = SceneManager.GetActiveScene();
+		scene.GetRootGameObjects( rootObjects );
+		foreach(GameObject t in rootObjects){
 			if(t.name == name){
 				return t.gameObject;
 			}

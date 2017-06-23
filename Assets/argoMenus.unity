@@ -1207,7 +1207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cf2c835acb714e07af84e989c11a218, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Image: {fileID: 0}
+  Image: {fileID: 1072821875}
   IdentityPoolId: us-west-2:bdbe6639-8a19-4315-b0ad-294039672635
   CognitoIdentityRegion: us-west-2
   S3Region: us-west-2
