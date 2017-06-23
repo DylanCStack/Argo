@@ -19,7 +19,7 @@ public class LaunchManager : MonoBehaviour {
 	}
 	public IEnumerator _OnOpenWithUrl(){
 		WWWForm login = new WWWForm ();
-		login.AddField ("phone", PlayerPrefs.GetString("phone");
+		login.AddField ("phone", PlayerPrefs.GetString("phone"));
 		login.AddField ("code", url.Substring (url.Length - 5));
 
 		WWW loginRequest = new WWW ("http://argo-server.herokuapp.com/user/login", login);
