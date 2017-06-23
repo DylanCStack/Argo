@@ -139,32 +139,34 @@ public class qrscanner3 : MonoBehaviour {
 		
 	void OnEnable() {
 
-		_qrid = "";
-		videoURL = "";
-		currentVideoName = "";
-		BarcodeScanner.Stop ();
-		BarcodeScanner.Camera.Play();
-		Debug.Log(BarcodeScanner.Camera);
-		FindObject(GameObject.Find ("HomeScreenPanel"), "RawImage").SetActive(true);
-		GameObject.Find ("RawImage").GetComponent<RawImage> ().enabled = true;
-		Image = GameObject.Find ("RawImage").GetComponent<RawImage> ();
-
-		// Display the camera texture through a RawImage
-		BarcodeScanner.OnReady += (sender, arg) => {
-			// Set Orientation & Texture
-			Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
-			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
-			Image.texture = BarcodeScanner.Camera.Texture;
-
-			// Keep Image Aspect Ratio
-			var rect = Image.GetComponent<RectTransform>();
-			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
-			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
-
-			RestartTime = 0;
-
-		};
-		StartScanner ();
+//		_qrid = "";
+//		videoURL = "";
+//		currentVideoName = "";
+//
+//		BarcodeScanner.Stop ();
+//		BarcodeScanner.Camera.Play();
+//		Debug.Log(BarcodeScanner.Camera);
+//		GameObject.Find("DisplayLog").GetComponent<Text>().text = "";
+//		FindObject(GameObject.Find ("HomeScreenPanel"), "RawImage").SetActive(true);
+//		GameObject.Find ("RawImage").GetComponent<RawImage> ().enabled = false;
+//		Image = GameObject.Find ("RawImage").GetComponent<RawImage> ();
+//
+//		// Display the camera texture through a RawImage
+//		BarcodeScanner.OnReady += (sender, arg) => {
+//			// Set Orientation & Texture
+//			Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
+//			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
+//			Image.texture = BarcodeScanner.Camera.Texture;
+//
+//			// Keep Image Aspect Ratio
+//			var rect = Image.GetComponent<RectTransform>();
+//			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
+//			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
+//
+//			RestartTime = 0;
+//
+//		};
+//		StartScanner ();
 
 	}
 	/// <summary>
@@ -445,6 +447,8 @@ public class qrscanner3 : MonoBehaviour {
 		//enable vuforia camera so it can track objects
 		GameObject arCamera = GameObject.Find("ARCamera");
 		arCamera.GetComponent<VuforiaBehaviour>().enabled = true;
+		GameObject camera = FindObject (arCamera, "Camera");
+		camera.SetActive (true);
 
 		//enable the image target so vuforia knows what to track
 		GameObject ARScanner = GameObject.Find("ImageTarget");
