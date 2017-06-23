@@ -4,6 +4,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 using Vuforia;
 
 public class ImageTargetPlayAudio : MonoBehaviour, ITrackableEventHandler {
@@ -18,6 +19,7 @@ public class ImageTargetPlayAudio : MonoBehaviour, ITrackableEventHandler {
 
 	void Start()
 	{
+		GameObject.Find ("TestObject").GetComponent<qrscanner3> ().enabled = false;
 
 		//get existing components and add audio
 		mTrackableBehaviour = GetComponent<TrackableBehaviour>();

@@ -21,7 +21,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 
 	// Check if running on iphone
 	#if UNITY_IOS
-		
+
 		//import videopicker method from custom iOS plugin
 		[DllImport("__Internal")]
 		private static extern void OpenVideoPicker(string game_object_name, string function_name);
@@ -29,18 +29,18 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 	#endif
 
 	//Amazon config
-	public string IdentityPoolId = "us-west-2:bdbe6639-8a19-4315-b0ad-294039672635";
-	public string CognitoIdentityRegion = RegionEndpoint.USWest2.SystemName;
+	private string IdentityPoolId = "us-west-2:bdbe6639-8a19-4315-b0ad-294039672635";
+	private string CognitoIdentityRegion = RegionEndpoint.USWest2.SystemName;
 	private RegionEndpoint _CognitoIdentityRegion
 	{
 		get { return RegionEndpoint.GetBySystemName(CognitoIdentityRegion); }
 	}
-	public string S3Region = RegionEndpoint.USWest2.SystemName;
+	private string S3Region = RegionEndpoint.USWest2.SystemName;
 	private RegionEndpoint _S3Region
 	{
 		get { return RegionEndpoint.GetBySystemName(S3Region); }
 	}
-	public string S3BucketName = "arn:aws:s3:::eyecueargo";
+	private string S3BucketName = "arn:aws:s3:::eyecueargo";
 	private IAmazonS3 _s3Client;
 	private BasicAWSCredentials Credentials = new BasicAWSCredentials("AKIAJQZXKUPR47AXETNA","GFyHFW/vjbGpV7Ek4Fr6A79UoitF0m0DCZmlCifc");
 
@@ -74,19 +74,27 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 	void Start () {//initialize AWS and open videopicker
 
 		UnityInitializer.AttachToGameObject(this.gameObject);
-//		OpenVideoPicker ("TestObject", "VideoPicked");
+
+		GameObject.Find("DisplayLog").GetComponent<Text>().text = "started";
+//		OpenVideoPicker ("ComposeButton", "VideoPicked");
 //		Debug.Log(SystemInfo.deviceUniqueIdentifier);
 //		PostObject("Assets/birthday.webm");
 //		GetObject();
-//		GetObjects();
+		GetObjects();
 
 
+	}
+
+	public void _OpenVideoPicker() {
+		Debug.Log("hello from _OpenVideoPicker");
+		GameObject.Find("DisplayLog").GetComponent<Text>().text = "opened video picker";
+		OpenVideoPicker ("ComposeButton", "VideoPicked");
 	}
 
 	//Post a video to S3
 	public void PostObject(string filePath)
 	{
-		
+		GameObject.Find("DisplayLog").GetComponent<Text>().text = "posting object";
 		//Adjust file name to be more readable
 		string fileName = filePath.Replace ("/", "");
 		string fileName2 = fileName.Replace ("tmptrim.", "");
@@ -98,40 +106,55 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 		//prepare file for upload
 		var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
+		Debug.Log (S3BucketName);
 		//prepares request to amazon
 		var request = new PostObjectRequest()
 		{
 			Bucket = S3BucketName,
-			Key = fileName4,
+			Key = fileName6,
 			InputStream = stream,
 			CannedACL = S3CannedACL.Private,
 			Region = _S3Region
 		};
-				
+		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = "request and bucket prepared";
 
+//		GameObject.Find ("LoadingPanel").SetActive (true);
+
+
+		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = "loading panel turned on";
 		//Post to s3 using current client
 		Client.PostObjectAsync(request, (responseObj) =>
 			{
 				if (responseObj.Exception == null)
 				{//successfully posted
 					Debug.Log(string.Format("\nobject {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket));
+					//Post record to ArgoDB
+					StartCoroutine (
+						PostToArgoDB (fileName6, "public", "noone")
+					);
+					GameObject.Find("DisplayLog").GetComponent<Text>().text = "posted and started co-routine";
 				}
 				else
 				{//did not post
+//					GameObject.Find("DisplayLog").GetComponent<Text>().text = "did not post to amazon";
 					Debug.Log("\nException while posting the result object");
 					Debug.Log(responseObj.Exception.Message);
 					Debug.Log(responseObj.Exception.Source);
+//					GameObject.Find ("LoadingPanel").SetActive (false);
 
 				}
 			});
 	}
-		
+
 
 
 	//collect returned information from iOS plugin
 	void VideoPicked( string path ){
+		GameObject.Find("DisplayLog").GetComponent<Text>().text = "video picked " + path;
 
-		//get image target 
+		UnityInitializer.AttachToGameObject(this.gameObject);
+
+		//get image target
 		VideoPlayer videoPreview = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
 
 		//prepare path name for movie preview
@@ -174,7 +197,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 		{
 			BucketName = S3BucketName
 		};
-
+		Debug.Log (S3BucketName);
 		Client.ListObjectsAsync(request, (responseObject) =>
 			{
 				Debug.Log( "\n");
@@ -192,7 +215,22 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 				}
 			});
 	}
-			
+
+	public IEnumerator PostToArgoDB(string filename,string privacy,string recipient) {
+
+		WWWForm testForm = new WWWForm();
+		testForm.AddField ("url", filename);
+		testForm.AddField ("privacy", privacy);
+		testForm.AddField ("recipient", recipient);
+		WWW request = new WWW("https://argo-server.herokuapp.com/message/upload", testForm);
+		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = "waiting for text to return " + filename;
+		yield return request;
+		Debug.Log(request.text);
+		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = request.text;
+//		GameObject.Find ("LoadingPanel").SetActive (false);
+
+	}
+
 
 
 }
