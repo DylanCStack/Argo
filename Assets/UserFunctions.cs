@@ -7,83 +7,73 @@ using simpleJSON;
 public class UserFunctions : MonoBehaviour {
 
 	public InputField phone;
-	public InputField email;
-	public InputField password;
 	public Text alerts;
+	public Text log;
+	public string url;
+
+	public void OnOpenWithUrl(string args){
+		log.text = args;
+		url = args;
+
+		StartCoroutine (LogIn ());
+	}
+
+	public IEnumerator LogIn(){
+		WWWForm login = new WWWForm ();
+		login.AddField ("phone", PlayerPrefs.GetString("phone"));
+		login.AddField ("code", url.Substring (url.Length - 5));
+
+		WWW loginRequest = new WWW ("http://argo-server.herokuapp.com/user/login", login);
+		yield return loginRequest;
+
+		var response = JSON.Parse (loginRequest.text);
+
+		if (response ["authToken"] != "false") {
+			PlayerPrefs.SetString ("authToken", response ["authToken"]);
+			log.text = "Successful login";
+		} else if (response ["error"].AsBool) {
+			//error
+			log.text = "There was an error logging in.";
+		} else {
+			log.text = "Incorrect code or phone number. Please verify again.";
+		}
+
+		log.text = loginRequest.text;
+	}
+
 
 	IEnumerator _register(){
+
+		PlayerPrefs.SetString ("phone", phone.text);
+
 		WWWForm form = new WWWForm ();
 		form.AddField("phone", phone.text);
-		form.AddField ("email", email.text);
-		form.AddField("password", password.text);
-		WWW register = new WWW("localhost:3000/user/register", form);
+		WWW register = new WWW("http://argo-server.herokuapp.com/user/verify", form);
 		yield return register;//wait for json response.
 
 		var response = JSON.Parse(register.text);
-
+		Debug.Log (register.text);
 		Debug.Log (response);
 		if(response["error"].AsBool){
 			alerts.text = "There was an error registering your account.";
-		} else if (!response["register"].AsBool){
-			alerts.text = "The phone number or email address is already in use.";
-		} else if(response["register"].AsBool){
-			alerts.text = "Successfully registered. Welcome to Argo.";
+		} else if (response["invalid number"].AsBool){
+			log.text = "Invalid phone number";
+		} else {
+			log.text = "A login code has been sent to " + phone.text;
 		}
 
 	}
 	public void register(){
-		if (phone.text != "" && password.text != "") {
+		Debug.Log (phone.text);
+		Debug.Log ("Verify button clicked.");
+		if (phone.text != "") {
 			StartCoroutine (_register ());
 		} else {
-			alerts.text = "Please enter a valid phone number and password";
+			alerts.text = "Please enter a valid phone number.";
 		}
 	}
-	IEnumerator _login(){
-		WWWForm form = new WWWForm ();
-		form.AddField("phone", phone.text);
-		form.AddField ("email", email.text);
-		form.AddField("password", password.text);
-
-		Dictionary<string, string> headers = form.headers;
-		headers ["cookie"] = PlayerPrefs.GetString ("cookie");
-
-		WWW loginRequest = new WWW("localhost:3000/user/login", form.data, headers);
-		yield return loginRequest;//wait for json response.
-
-		var response = JSON.Parse(loginRequest.text);
 
 
-
-		Debug.Log (response);
-		if(response["error"].AsBool){
-			alerts.text = "There was an error registering your account.";
-		} else if (!response["login"].AsBool){
-			alerts.text = "Invalid phone number or password.";
-		} else if(response["login"].AsBool){
-			Debug.Log (loginRequest.text);
-
-
-			if (loginRequest.responseHeaders.ContainsKey("SET-COOKIE")) {
-				Debug.Log ("SETTING NEW KEY");
-				string cookie = loginRequest.responseHeaders ["SET-COOKIE"];//.Substring (8);//gets cookie data to be set
-//			string cookie = loginRequest.responseHeaders ["SET-COOKIE"] || loginRequest.responseHeaders[""];//gets cookie data to be set
-
-				PlayerPrefs.SetString ("cookie", cookie);
-			}
-			Debug.Log (PlayerPrefs.GetString("cookie"));
-
-			alerts.text = "Successfully logged in. Welcome Back.";
-		}
-
-	}
-
-	public void login(){
-		if (phone.text != "" && password.text != "") {
-			StartCoroutine (_login ());
-		} else {
-			alerts.text = "Please enter a valid phone number and password";
-		}
-	}
 
 //	public WWW submit(string url){//make form and submission as a repeatable funciton
 //

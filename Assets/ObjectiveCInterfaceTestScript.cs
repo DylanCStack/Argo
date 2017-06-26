@@ -21,7 +21,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 
 	// Check if running on iphone
 	#if UNITY_IOS
-		
+
 		//import videopicker method from custom iOS plugin
 		[DllImport("__Internal")]
 		private static extern void OpenVideoPicker(string game_object_name, string function_name);
@@ -74,13 +74,14 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 	void Start () {//initialize AWS and open videopicker
 
 		UnityInitializer.AttachToGameObject(this.gameObject);
+
 		GameObject.Find("DisplayLog").GetComponent<Text>().text = "started";
 //		OpenVideoPicker ("ComposeButton", "VideoPicked");
 //		Debug.Log(SystemInfo.deviceUniqueIdentifier);
 //		PostObject("Assets/birthday.webm");
 //		GetObject();
 		GetObjects();
-		
+
 
 	}
 
@@ -116,7 +117,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 			Region = _S3Region
 		};
 		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = "request and bucket prepared";
-				
+
 //		GameObject.Find ("LoadingPanel").SetActive (true);
 
 
@@ -144,7 +145,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 				}
 			});
 	}
-		
+
 
 
 	//collect returned information from iOS plugin
@@ -153,7 +154,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
-		//get image target 
+		//get image target
 		VideoPlayer videoPreview = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
 
 		//prepare path name for movie preview
@@ -216,7 +217,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 	}
 
 	public IEnumerator PostToArgoDB(string filename,string privacy,string recipient) {
-				
+
 		WWWForm testForm = new WWWForm();
 		testForm.AddField ("url", filename);
 		testForm.AddField ("privacy", privacy);
@@ -229,7 +230,7 @@ public class ObjectiveCInterfaceTestScript : MonoBehaviour {
 //		GameObject.Find ("LoadingPanel").SetActive (false);
 
 	}
-			
+
 
 
 }
