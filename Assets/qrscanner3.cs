@@ -16,7 +16,7 @@ using Amazon.Runtime;
 using Amazon.S3.Util;
 using Amazon.CognitoIdentity;
 using Amazon;
-
+using APIKeys;
 
 
 public class qrscanner3 : MonoBehaviour {
@@ -255,7 +255,7 @@ public class qrscanner3 : MonoBehaviour {
 	}
 	public string S3BucketName = "eyecueargo";
 	private IAmazonS3 _s3Client;
-	private BasicAWSCredentials Credentials = new BasicAWSCredentials("AKIAIWRQUPSW4SCCLD4Q","lDX+bLTeY9xdofU0kEytq66GbpjDUCRiYF58ObNG");
+	private BasicAWSCredentials Credentials = new BasicAWSCredentials(AWSKeys.visible, AWSKeys.secret);
 
 
 	//Client constructor
