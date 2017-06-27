@@ -26,10 +26,13 @@ public class qrscanner3 : MonoBehaviour {
 	private float RestartTime;
 	private WebCamTexture camTexture;
 	private Rect screenRect;
-	private bool foundQR = false;
 	public static string _qrid;
 	private string videoName;
 	private string currentVideoName;
+	private Dictionary <string, string> contacts = new Dictionary<string, string>();
+
+	public string contact = null;
+	public string recipient = null;
 	/////////////////////////////////////////////////////////////////SCANNER METHODS
 	// Disable Screen Rotation on that screen
 	void Awake()
@@ -39,8 +42,91 @@ public class qrscanner3 : MonoBehaviour {
 	}
 
 	void Start () {
-
-
+		_OpenContactPicker ();
+//		ContactPicked("Fuck fuck|09345710");
+//		ContactPicked("Fuck poop|01234710");
+//		ContactPicked("Fuck shit|09345710");
+//		ContactPicked("Fuck balls|09345710");
+//		ContactPicked("Fuck yuck|09345710");
+//		ContactPicked("Fuc dont|09345710");
+//		ContactPicked("Fuk @mebro|09345710");
+//		ContactPicked("Fck fuck|09345710");
+//		ContactPicked("ck poop|01234710");
+//		ContactPicked("Fck shit|09345710");
+//		ContactPicked("uck balls|09345710");
+//		ContactPicked("uck yuck|09345710");
+//		ContactPicked("uck dont|09345710");
+//		ContactPicked("uck @mebro|09345710");
+//		ContactPicked("uck fuck|09345710");
+//		ContactPicked("uck poop|01234710");
+//		ContactPicked("s shit|09345710");
+//		ContactPicked("Fck balls|09345710");
+//		ContactPicked("Fck yuck|09345710");
+//		ContactPicked("Fck dont|09345710");
+//		ContactPicked("Fck @mebro|09345710");
+//		ContactPicked("Fuc fuck|09345710");
+//		ContactPicked("Fuc poop|01234710");
+//		ContactPicked("Fuc shit|09345710");
+//		ContactPicked("Fuc balls|09345710");
+//		ContactPicked("Fuc yuck|09345710");
+//		ContactPicked("Fucdont|09345710");
+//		ContactPicked("Fuk@mebro|09345710");
+//		ContactPicked("Fckfuck|09345710");
+//		ContactPicked("ck oop|01234710");
+//		ContactPicked("Fc shit|09345710");
+//		ContactPicked("uc balls|09345710");
+//		ContactPicked("uc yuck|09345710");
+//		ContactPicked("uc dont|09345710");
+//		ContactPicked("uc @mebro|09345710");
+//		ContactPicked("uc fuck|09345710");
+//		ContactPicked("uc poop|01234710");
+//		ContactPicked("Fac shit|09345710");
+//		ContactPicked("Fc balls|09345710");
+//		ContactPicked("Fc yuck|09345710");
+//		ContactPicked("Fc dont|09345710");
+//		ContactPicked("Fc @mebro|09345710");
+//		ContactPicked("Fuckw fuck|09345710");
+//		ContactPicked("Fuckw poop|01234710");
+//		ContactPicked("Fuckw shit|09345710");
+//		ContactPicked("Fuckw balls|09345710");
+//		ContactPicked("Fuckw yuck|09345710");
+//		ContactPicked("Fuc wdont|09345710");
+//		ContactPicked("Fuk w@mebro|09345710");
+//		ContactPicked("Fck wfuck|09345710");
+//		ContactPicked("ck powop|01234710");
+//		ContactPicked("Fck wshit|09345710");
+//		ContactPicked("uck wballs|09345710");
+//		ContactPicked("uck wyuck|09345710");
+//		ContactPicked("uck wdont|09345710");
+//		ContactPicked("uck w@mebro|09345710");
+//		ContactPicked("uck wfuck|09345710");
+//		ContactPicked("uck wpoop|01234710");
+//		ContactPicked("s shwit|09345710");
+//		ContactPicked("Fck wballs|09345710");
+//		ContactPicked("Fck wyuck|09345710");
+//		ContactPicked("Fck wdont|09345710");
+//		ContactPicked("Fck w@mebro|09345710");
+//		ContactPicked("Fuc wfuck|09345710");
+//		ContactPicked("Fuc wpoop|01234710");
+//		ContactPicked("Fuc wshit|09345710");
+//		ContactPicked("Fuc wballs|09345710");
+//		ContactPicked("Fuc wyuck|09345710");
+//		ContactPicked("Fucdwont|09345710");
+//		ContactPicked("Fuk@wmebro|09345710");
+//		ContactPicked("Fckfwuck|09345710");
+//		ContactPicked("ck owop|01234710");
+//		ContactPicked("Fc swhit|09345710");
+//		ContactPicked("uc bwalls|09345710");
+//		ContactPicked("uc ywuck|09345710");
+//		ContactPicked("uc dwont|09345710");
+//		ContactPicked("uc @wmebro|09345710");
+//		ContactPicked("uc fwuck|09345710");
+//		ContactPicked("uc pwoop|01234710");
+//		ContactPicked("Fc swashit|09345710");
+//		ContactPicked("Fc bwalls|09345710");
+//		ContactPicked("Fc ywuck|09345710");
+//		ContactPicked("Fc dwont|09345710");
+//		ContactPicked("Fc @wmebro|09345710");
 	}
 		
 	void OnEnable() {
@@ -140,6 +226,9 @@ public class qrscanner3 : MonoBehaviour {
 		//import videopicker method from custom iOS plugin
 		[DllImport("__Internal")]
 		private static extern void OpenVideoPicker (string game_object_name, string function_name);
+
+		[DllImport("__Internal")]
+		private static extern void OpenContactPicker (string game_object_name, string function_name);
 	#endif
 
 	public void _OpenVideoPicker() {
@@ -148,6 +237,12 @@ public class qrscanner3 : MonoBehaviour {
 		PlayerPrefs.SetString ("qrid", _qrid);
 		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
 		OpenVideoPicker ("TestObject", "VideoPicked");//sends request to iOS with "TestObject" as return location and "VideoPicked" as callback function
+	}
+
+	public void _OpenContactPicker() {
+		Debug.Log("hello from _OpenContactPicker");
+//		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
+		OpenContactPicker ("TestObject", "ContactPicked");//sends request to iOS with "TestObject" as return location and "ContactPicked" as callback function
 	}
 
 	//collect returned information from iOS plugin
@@ -171,6 +266,24 @@ public class qrscanner3 : MonoBehaviour {
 
 	}
 
+	void ContactPicked( string name ){
+
+		Debug.Log (name);
+		String[] contactArray = name.Split ('|');
+		contacts.Add (contactArray[0], contactArray [1]);
+		Transform list = GameObject.Find ("AddressBookPanel").transform;
+		GameObject button = (GameObject)Instantiate(Resources.Load("AddressBookButton"), list);
+		button.GetComponentInChildren<Text> ().text = contactArray [0];
+		GameObject addressBookPanel = GameObject.Find ("AddressBookPanel");
+		addressBookPanel.GetComponent<RectTransform> ().sizeDelta = new Vector2 (100, 50 * contacts.Count);
+		button.GetComponent<Button> ().onClick.AddListener (() => {
+			sendTo (contactArray[1]);
+		});
+	}
+
+	void sendTo (string name){
+		recipient = contacts[name];
+	}
 
 	/////////////////////////////////ARGO SERVER METHODS
 
@@ -224,7 +337,6 @@ public class qrscanner3 : MonoBehaviour {
 		if(player.url != bucket + videoName) {
 			player.url = bucket + videoName;
 		}
-		foundQR = true;
 	}
 
 
@@ -282,6 +394,26 @@ public class qrscanner3 : MonoBehaviour {
 		};
 
 		//post request to amazon
+		StartCoroutine(SendMessage( request));//move to coroutine below which will wait for contact to be chosen.
+	}
+	public void SetContact(string chosenContact){
+		contact = recipient;
+	}
+
+	public IEnumerator SendMessage(PostObjectRequest request){
+		GameObject ContactPicker = FindObject(GameObject.Find("Canvas"), "ContactPickerPanel");
+		GameObject homePanel = GameObject.Find ("HomeScreenPanel");
+
+		ContactPicker.SetActive (true);
+		homePanel.SetActive(false);
+
+		while (contact==null) {
+			yield return contact;
+		}
+
+		homePanel.SetActive (true);
+		ContactPicker.SetActive (false);
+
 		Client.PostObjectAsync(request, (responseObj) =>
 			{
 				if (responseObj.Exception == null)
@@ -290,7 +422,7 @@ public class qrscanner3 : MonoBehaviour {
 
 					//Post record to ArgoDB
 					StartCoroutine (
-						PostToArgoDB (videoName, "public", "noone")
+						PostToArgoDB (videoName, "public", recipient)
 					);
 				}
 				else
