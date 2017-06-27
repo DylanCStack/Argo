@@ -177,20 +177,27 @@ public class qrscanner3 : MonoBehaviour {
 	/// check if qrid exists
 	public IEnumerator CheckArgoDB(string qrid) {
 		WWWForm form = new WWWForm();
+		Dictionary<string, string> headers = new Dictionary<string, string> (){
+			{"authToken", PlayerPrefs.GetString("authToken")}
+		};
 		form.AddField ("qrid", qrid);
-		WWW request = new WWW ("https://argo-server.herokuapp.com/message/isRegistered", form);
+		WWW request = new WWW ("https://argo-server.herokuapp.com/message/checkCode", form.data, headers);
 		yield return request;
 		yield return request.text;
+		GameObject.Find("DisplayLog").GetComponent<Text>().text = request.text;
 	}
 
 	/// post a new message
 	public IEnumerator PostToArgoDB(string filename,string privacy,string recipient) {
 		WWWForm testForm = new WWWForm();
+		Dictionary<string, string> headers = new Dictionary<string, string> (){
+			{"authToken", PlayerPrefs.GetString("authToken")}
+		};
 		testForm.AddField ("url", filename);
 		testForm.AddField ("privacy", privacy);
 		testForm.AddField ("recipient", recipient);
 		testForm.AddField ("qrid",_qrid);
-		WWW request = new WWW("https://argo-server.herokuapp.com/message/upload", testForm);
+		WWW request = new WWW("https://argo-server.herokuapp.com/message/upload", testForm.data, headers);
 		yield return request;
 		Debug.Log(request.text);
 		videoName = request.text;
