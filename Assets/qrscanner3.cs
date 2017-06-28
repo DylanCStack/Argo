@@ -17,6 +17,7 @@ using Amazon.S3.Util;
 using Amazon.CognitoIdentity;
 using Amazon;
 using APIKeys;
+using simpleJSON;
 
 
 public class qrscanner3 : MonoBehaviour {
@@ -43,94 +44,12 @@ public class qrscanner3 : MonoBehaviour {
 
 	void Start () {
 		_OpenContactPicker ();
-//		ContactPicked("Fuck fuck|09345710");
-//		ContactPicked("Fuck poop|01234710");
-//		ContactPicked("Fuck shit|09345710");
-//		ContactPicked("Fuck balls|09345710");
-//		ContactPicked("Fuck yuck|09345710");
-//		ContactPicked("Fuc dont|09345710");
-//		ContactPicked("Fuk @mebro|09345710");
-//		ContactPicked("Fck fuck|09345710");
-//		ContactPicked("ck poop|01234710");
-//		ContactPicked("Fck shit|09345710");
-//		ContactPicked("uck balls|09345710");
-//		ContactPicked("uck yuck|09345710");
-//		ContactPicked("uck dont|09345710");
-//		ContactPicked("uck @mebro|09345710");
-//		ContactPicked("uck fuck|09345710");
-//		ContactPicked("uck poop|01234710");
-//		ContactPicked("s shit|09345710");
-//		ContactPicked("Fck balls|09345710");
-//		ContactPicked("Fck yuck|09345710");
-//		ContactPicked("Fck dont|09345710");
-//		ContactPicked("Fck @mebro|09345710");
-//		ContactPicked("Fuc fuck|09345710");
-//		ContactPicked("Fuc poop|01234710");
-//		ContactPicked("Fuc shit|09345710");
-//		ContactPicked("Fuc balls|09345710");
-//		ContactPicked("Fuc yuck|09345710");
-//		ContactPicked("Fucdont|09345710");
-//		ContactPicked("Fuk@mebro|09345710");
-//		ContactPicked("Fckfuck|09345710");
-//		ContactPicked("ck oop|01234710");
-//		ContactPicked("Fc shit|09345710");
-//		ContactPicked("uc balls|09345710");
-//		ContactPicked("uc yuck|09345710");
-//		ContactPicked("uc dont|09345710");
-//		ContactPicked("uc @mebro|09345710");
-//		ContactPicked("uc fuck|09345710");
-//		ContactPicked("uc poop|01234710");
-//		ContactPicked("Fac shit|09345710");
-//		ContactPicked("Fc balls|09345710");
-//		ContactPicked("Fc yuck|09345710");
-//		ContactPicked("Fc dont|09345710");
-//		ContactPicked("Fc @mebro|09345710");
-//		ContactPicked("Fuckw fuck|09345710");
-//		ContactPicked("Fuckw poop|01234710");
-//		ContactPicked("Fuckw shit|09345710");
-//		ContactPicked("Fuckw balls|09345710");
-//		ContactPicked("Fuckw yuck|09345710");
-//		ContactPicked("Fuc wdont|09345710");
-//		ContactPicked("Fuk w@mebro|09345710");
-//		ContactPicked("Fck wfuck|09345710");
-//		ContactPicked("ck powop|01234710");
-//		ContactPicked("Fck wshit|09345710");
-//		ContactPicked("uck wballs|09345710");
-//		ContactPicked("uck wyuck|09345710");
-//		ContactPicked("uck wdont|09345710");
-//		ContactPicked("uck w@mebro|09345710");
-//		ContactPicked("uck wfuck|09345710");
-//		ContactPicked("uck wpoop|01234710");
-//		ContactPicked("s shwit|09345710");
-//		ContactPicked("Fck wballs|09345710");
-//		ContactPicked("Fck wyuck|09345710");
-//		ContactPicked("Fck wdont|09345710");
-//		ContactPicked("Fck w@mebro|09345710");
-//		ContactPicked("Fuc wfuck|09345710");
-//		ContactPicked("Fuc wpoop|01234710");
-//		ContactPicked("Fuc wshit|09345710");
-//		ContactPicked("Fuc wballs|09345710");
-//		ContactPicked("Fuc wyuck|09345710");
-//		ContactPicked("Fucdwont|09345710");
-//		ContactPicked("Fuk@wmebro|09345710");
-//		ContactPicked("Fckfwuck|09345710");
-//		ContactPicked("ck owop|01234710");
-//		ContactPicked("Fc swhit|09345710");
-//		ContactPicked("uc bwalls|09345710");
-//		ContactPicked("uc ywuck|09345710");
-//		ContactPicked("uc dwont|09345710");
-//		ContactPicked("uc @wmebro|09345710");
-//		ContactPicked("uc fwuck|09345710");
-//		ContactPicked("uc pwoop|01234710");
-//		ContactPicked("Fc swashit|09345710");
-//		ContactPicked("Fc bwalls|09345710");
-//		ContactPicked("Fc ywuck|09345710");
-//		ContactPicked("Fc dwont|09345710");
-//		ContactPicked("Fc @wmebro|09345710");
 	}
 		
 	void OnEnable() {
 
+		Image = GameObject.Find ("RawImage").GetComponent<RawImage>();
+		Debug.Log (Image);
 		//attach amazon details
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
@@ -197,10 +116,13 @@ public class qrscanner3 : MonoBehaviour {
 			_OpenVideoPicker ();
 
 		} else {//video found in database
+			
+			if (cd.result.ToString() != "error") {
 
-			videoName = cd.result.ToString ();
-			StartVuforia ();
-
+				videoName = cd.result.ToString();
+				Debug.Log ("hello video name is" + videoName);
+				StartVuforia ();
+			}
 		}
 	}
 
@@ -267,22 +189,20 @@ public class qrscanner3 : MonoBehaviour {
 	}
 
 	void ContactPicked( string name ){
-
-		Debug.Log (name);
+		
 		String[] contactArray = name.Split ('|');
 		contacts.Add (contactArray[0], contactArray [1]);
-		Transform list = GameObject.Find ("AddressBookPanel").transform;
-		GameObject button = (GameObject)Instantiate(Resources.Load("AddressBookButton"), list);
+		GameObject list = FindObject(GameObject.Find("Canvas"),"AddressBookPanel");
+		GameObject button = (GameObject)Instantiate(Resources.Load("AddressBookButton"), list.transform);
 		button.GetComponentInChildren<Text> ().text = contactArray [0];
-		GameObject addressBookPanel = GameObject.Find ("AddressBookPanel");
-		addressBookPanel.GetComponent<RectTransform> ().sizeDelta = new Vector2 (100, 50 * contacts.Count);
+		list.GetComponent<RectTransform> ().sizeDelta = new Vector2 (100, 50 * contacts.Count);
 		button.GetComponent<Button> ().onClick.AddListener (() => {
 			sendTo (contactArray[1]);
 		});
 	}
 
-	void sendTo (string name){
-		recipient = contacts[name];
+	void sendTo (string number){
+		recipient = number;
 	}
 
 	/////////////////////////////////ARGO SERVER METHODS
@@ -297,8 +217,14 @@ public class qrscanner3 : MonoBehaviour {
 		);
 		WWW request = new WWW ("https://argo-server.herokuapp.com/message/checkCode", form.data, headers);
 		yield return request;
-		yield return request.text;
-		GameObject.Find("DisplayLog").GetComponent<Text>().text = request.text;
+		var ArgoResult = JSON.Parse(request.text);
+
+		if (ArgoResult ["error"].AsBool) {
+			Debug.Log (ArgoResult ["error"]);
+			yield return @"error";
+		}
+		yield return ArgoResult["response"];	
+		GameObject.Find("DisplayLog").GetComponent<Text>().text = ArgoResult["response"];
 	}
 
 	/// post a new message
@@ -315,8 +241,9 @@ public class qrscanner3 : MonoBehaviour {
 		);
 		WWW request = new WWW("https://argo-server.herokuapp.com/message/upload", form.data, headers);
 		yield return request;
-		Debug.Log(request.text);
-		videoName = request.text;
+		var ArgoResult = JSON.Parse (request.text);
+		yield return ArgoResult;
+		videoName = ArgoResult["response"];
 		GameObject.Find ("LoadingPanel").SetActive(false);
 		StartVuforia();
 	}
@@ -342,10 +269,11 @@ public class qrscanner3 : MonoBehaviour {
 		GameObject.Find("RawImage").SetActive(false);
 
 		string bucket = "https://s3-us-west-2.amazonaws.com/eyecueargo/";
-
+		string videoName2 = videoName.Replace ("\"", "");
+		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = bucket + videoName2;
 		//set video url to value of qr code
-		if(player.url != bucket + videoName) {
-			player.url = bucket + videoName;
+		if(player.url != bucket + videoName2) {
+			player.url = bucket + videoName2;
 		}
 	}
 
@@ -406,8 +334,11 @@ public class qrscanner3 : MonoBehaviour {
 		//post request to amazon
 		StartCoroutine(SendMessage( request));//move to coroutine below which will wait for contact to be chosen.
 	}
-	public void SetContact(string chosenContact){
+
+	public void SetContact(){
 		contact = recipient;
+		Debug.Log ("hello from set contact");
+		Debug.Log (recipient);
 	}
 
 	public IEnumerator SendMessage(PostObjectRequest request){
@@ -416,13 +347,18 @@ public class qrscanner3 : MonoBehaviour {
 
 		ContactPicker.SetActive (true);
 		homePanel.SetActive(false);
+		Debug.Log ("hello from 418");
 
-		while (contact==null) {
-			yield return contact;
+		contact = null;
+
+		while (String.IsNullOrEmpty(contact)) {
+			yield return null;
 		}
 
+		Debug.Log ("hello from 425");
 		homePanel.SetActive (true);
 		ContactPicker.SetActive (false);
+		Debug.Log ("hello from 428");
 
 		Client.PostObjectAsync(request, (responseObj) =>
 			{
@@ -432,7 +368,7 @@ public class qrscanner3 : MonoBehaviour {
 
 					//Post record to ArgoDB
 					StartCoroutine (
-						PostToArgoDB (videoName, "public", recipient)
+						PostToArgoDB (videoName, "private", contact)
 					);
 				}
 				else

@@ -19,13 +19,22 @@ public class ReloadScene : MonoBehaviour {
 	}
 
 	public void reloadScene () {
-		if (GameObject.Find ("ARCamera")) {
-//			Destroy(GameObject.Find ("ARCamera"));
-		}
-		if (GameObject.Find ("TestObject")) {
-//			Destroy (GameObject.Find ("TestObject"));
-		}
-		SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex);
+//		if (GameObject.Find ("ARCamera")) {
+////			Destroy(GameObject.Find ("ARCamera"));
+//		}
+//		if (GameObject.Find ("TestObject")) {
+////			Destroy (GameObject.Find ("TestObject"));
+//		}
+//		SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex);
+
+		GameObject.Find ("ARCamera").GetComponent<VuforiaBehaviour> ().enabled = false;
+		Debug.Log ("---------disable vuforia behaviour----------");
+		GameObject.Find ("ARCamera").SetActive (false);
+		Debug.Log ("---------set arcamera inactive----------");
+		FindObject (GameObject.Find("HomeScreenPanel"),"RawImage").SetActive (true);	
+		Debug.Log ("---------set raw image active----------");
+		GameObject.Find ("TestObject").GetComponent<qrscanner3> ().enabled = true;
+		Debug.Log ("---------enabled qr scanner----------");
 
 	}
 
