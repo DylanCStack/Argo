@@ -9,6 +9,10 @@ public class UserFunctions : MonoBehaviour {
 	public InputField phone;
 	public Text alerts;
 	public Text log;
+	public GameObject Panel;
+
+	private bool waiting = false;
+
 	public string url;
 
 	public void OnOpenWithUrl(string args){
@@ -31,6 +35,7 @@ public class UserFunctions : MonoBehaviour {
 		if (response ["authToken"] != "false") {
 			PlayerPrefs.SetString ("authToken", response ["authToken"]);
 			log.text = "Successful login";
+			waiting = false;
 		} else if (response ["error"].AsBool) {
 			//error
 			log.text = "There was an error logging in.";
@@ -42,20 +47,21 @@ public class UserFunctions : MonoBehaviour {
 	}
 
 
-	IEnumerator _register(){
+	IEnumerator _verifyPhone(){
 
 		PlayerPrefs.SetString ("phone", phone.text);
 
 		WWWForm form = new WWWForm ();
 		form.AddField("phone", phone.text);
-		WWW register = new WWW("http://argo-server.herokuapp.com/user/verify", form);
-		yield return register;//wait for json response.
+		WWW verifyPhone = new WWW("http://argo-server.herokuapp.com/user/verify", form);
+		waiting = true;
+		yield return verifyPhone;//wait for json response.
 
-		var response = JSON.Parse(register.text);
-		Debug.Log (register.text);
+		var response = JSON.Parse(verifyPhone.text);
+		Debug.Log (verifyPhone.text);
 		Debug.Log (response);
 		if(response["error"].AsBool){
-			alerts.text = "There was an error registering your account.";
+			alerts.text = "There was an error verifying your account.";
 		} else if (response["invalid number"].AsBool){
 			log.text = "Invalid phone number";
 		} else {
@@ -63,11 +69,11 @@ public class UserFunctions : MonoBehaviour {
 		}
 
 	}
-	public void register(){
+	public void verifyPhone(){
 		Debug.Log (phone.text);
 		Debug.Log ("Verify button clicked.");
 		if (phone.text != "") {
-			StartCoroutine (_register ());
+			StartCoroutine (_verifyPhone ());
 		} else {
 			alerts.text = "Please enter a valid phone number.";
 		}
@@ -94,6 +100,10 @@ public class UserFunctions : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if (waiting) {
+			Panel.SetActive (true);
+		} else {
+			Panel.SetActive (false);
+		}
 	}
 }

@@ -34,6 +34,8 @@ public class qrscanner3 : MonoBehaviour {
 
 	public string contact = null;
 	public string recipient = null;
+
+
 	/////////////////////////////////////////////////////////////////SCANNER METHODS
 	// Disable Screen Rotation on that screen
 	void Awake()
@@ -155,26 +157,33 @@ public class qrscanner3 : MonoBehaviour {
 
 		[DllImport("__Internal")]
 		private static extern void OpenContactPicker (string game_object_name, string function_name);
+
+		public void _OpenVideoPicker() {
+			Debug.Log("hello from _OpenVideoPicker");
+			Debug.Log (_qrid + "from 240");
+			PlayerPrefs.SetString ("qrid", _qrid);
+			FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
+			OpenVideoPicker ("TestObject", "VideoPicked");//sends request to iOS with "TestObject" as return location and "VideoPicked" as callback function
+		}
+
+		public void _OpenContactPicker() {
+			Debug.Log("hello from _OpenContactPicker");
+	//		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
+			OpenContactPicker ("TestObject", "ContactPicked");//sends request to iOS with "TestObject" as return location and "ContactPicked" as callback function
+		}
+		
+
+	#else//empty functions to appease the unity editor
+
+		public void _OpenContactPicker(){
+
+		}
+		public void _OpenVideoPicker(){
+
+		}
+
+
 	#endif
-
-	public void _OpenVideoPicker() {
-		Debug.Log("hello from _OpenVideoPicker");
-		Debug.Log (_qrid + "from 240");
-		PlayerPrefs.SetString ("qrid", _qrid);
-		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
-		OpenVideoPicker ("TestObject", "VideoPicked");//sends request to iOS with "TestObject" as return location and "VideoPicked" as callback function
-	}
-
-	public void _OpenContactPicker() {
-		Debug.Log("hello from _OpenContactPicker");
-//		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
-		OpenContactPicker ("TestObject", "ContactPicked");//sends request to iOS with "TestObject" as return location and "ContactPicked" as callback function
-	}
-
-	public void PickerDidCancel(string cancel) {
-		GameObject.Find ("LoadingPanel").SetActive (false);
-	}
-
 
 	//collect returned information from iOS plugin
 	void VideoPicked( string path ){
@@ -208,6 +217,10 @@ public class qrscanner3 : MonoBehaviour {
 		button.GetComponent<Button> ().onClick.AddListener (() => {
 			sendTo (contactArray[1]);
 		});
+	}
+
+	public void PickerDidCancel(string cancel) {
+		GameObject.Find ("LoadingPanel").SetActive (false);
 	}
 
 	void sendTo (string number){
@@ -344,7 +357,7 @@ public class qrscanner3 : MonoBehaviour {
 		};
 
 		//post request to amazon
-		StartCoroutine(SendMessage( request));//move to coroutine below which will wait for contact to be chosen.
+		StartCoroutine(RequireLogin(SendMessage( request)));//move to coroutine below which will wait for contact to be chosen.
 	}
 
 	public void SetContact(){
@@ -389,6 +402,26 @@ public class qrscanner3 : MonoBehaviour {
 					Debug.Log(responseObj.Exception.Message);
 				}
 			});
+	}
+
+	public IEnumerator RequireLogin(IEnumerator next){
+		GameObject VerifyPanel = FindObject(GameObject.Find("Canvas"), "VerifyPanel");
+		GameObject HomePanel = GameObject.Find ("HomeScreenPanel");
+
+		if (PlayerPrefs.GetString ("authToken").Length < 1) {
+			VerifyPanel.SetActive (true);
+			HomePanel.SetActive (false);
+		}
+
+		//verification panel will stay open until user confirms their phone number or chooses not to verify.
+		//if user chooses not to verify they will be reset at the home screen by in a separate script. 
+		while (PlayerPrefs.GetString ("authToken").Length < 1) {
+			yield return null;
+		}
+
+		VerifyPanel.SetActive (false);
+		HomePanel.SetActive (true);
+		StartCoroutine (next);
 	}
 
 /// ///////////////////////////////FILE NAME CREATION
@@ -470,6 +503,3 @@ public class CoroutineWithData {
 		this.coroutine = null;
 	}
 }
-	
-
-
