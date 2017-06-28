@@ -71,9 +71,20 @@ public class qrscanner3 : MonoBehaviour {
 			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
 			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
 
-			RestartTime = Time.realtimeSinceStartup;
+			RestartTime += Time.realtimeSinceStartup + 1f;
 		};
 
+		Debug.Log ("------------------real time since startup---------------------");
+		Debug.Log (Time.realtimeSinceStartup);
+		Debug.Log ("------------------restart time---------------------");
+		Debug.Log (RestartTime);
+		Debug.Log ("------------------real time since startup 2---------------------");
+		Debug.Log (Time.realtimeSinceStartup);
+
+	}
+
+	void OnDisable() {
+		
 	}
 		
 		
@@ -81,16 +92,17 @@ public class qrscanner3 : MonoBehaviour {
 	{
 		if (BarcodeScanner != null)
 		{
+			Debug.Log ("------------------real time since startup---------------------");
+			Debug.Log (Time.realtimeSinceStartup);
 
 			BarcodeScanner.Update();
-		} else if (BarcodeScanner == null) {//when scanner has been destroyed create new one
-			
 
-		}
+		}  
 
 		// Check if the Scanner need to be started or restarted
 		if (RestartTime != 0 && RestartTime < Time.realtimeSinceStartup)
 		{
+
 			StartScanner();
 			RestartTime = 0;
 
@@ -130,6 +142,7 @@ public class qrscanner3 : MonoBehaviour {
 	/////////////////////////////////SCANNER METHODS
 	private void StartScanner()
 	{
+		Debug.Log ("--------------scanning started-----------------");
 		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
 			BarcodeScanner.Stop();
 			if(_qrid != barCodeValue) {
@@ -137,9 +150,9 @@ public class qrscanner3 : MonoBehaviour {
 				GameObject.Find("DisplayLog").GetComponent<Text>().text = barCodeValue;
 				CoroutineWithData cd = new CoroutineWithData(this, checkURL(barCodeValue));
 			} else {
-
+				
 			}
-			RestartTime += Time.realtimeSinceStartup + 1f;
+			RestartTime += 1f;
 		});
 	}
 
@@ -267,6 +280,10 @@ public class qrscanner3 : MonoBehaviour {
 		ARScanner.GetComponent<ImageTargetPlayAudio>().enabled = true;
 
 		GameObject.Find("RawImage").SetActive(false);
+
+		StartCoroutine(StopCamera(() => {
+			
+		}));
 
 		string bucket = "https://s3-us-west-2.amazonaws.com/eyecueargo/";
 		string videoName2 = videoName.Replace ("\"", "");
@@ -418,6 +435,21 @@ public class qrscanner3 : MonoBehaviour {
 			}
 		}
 		return null;
+	}
+
+
+
+	public IEnumerator StopCamera(Action callback)
+	{
+		// Stop Scanning
+		Image = null;
+		BarcodeScanner.Destroy();
+		BarcodeScanner = null;
+
+		// Wait a bit
+		yield return new WaitForSeconds(0.1f);
+
+		callback.Invoke();
 	}
 }
 

@@ -35,6 +35,7 @@ public class ReloadScene : MonoBehaviour {
 		Debug.Log ("---------set raw image active----------");
 		GameObject.Find ("TestObject").GetComponent<qrscanner3> ().enabled = true;
 		Debug.Log ("---------enabled qr scanner----------");
+		GameObject.Find ("ImageTarget").GetComponent<ImageTargetPlayAudio> ().enabled = false;
 
 	}
 

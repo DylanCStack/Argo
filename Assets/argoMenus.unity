@@ -841,28 +841,6 @@ MonoBehaviour:
   alerts: {fileID: 1113790287}
   log: {fileID: 1113790287}
   url: 
---- !u!1 &188470365 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 100000, guid: bf30d577eead1ef40bcf2b404289daf4, type: 2}
-  m_PrefabInternal: {fileID: 334537441}
---- !u!114 &188470367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 188470365}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cf2c835acb714e07af84e989c11a218, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Image: {fileID: 1072821875}
-  contact: 
-  recipient: 
-  IdentityPoolId: us-west-2:bdbe6639-8a19-4315-b0ad-294039672635
-  CognitoIdentityRegion: us-west-2
-  S3Region: us-west-2
-  S3BucketName: eyecueargo
 --- !u!1 &197758391
 GameObject:
   m_ObjectHideFlags: 0

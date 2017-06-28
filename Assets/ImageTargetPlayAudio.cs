@@ -44,6 +44,10 @@ public class ImageTargetPlayAudio : MonoBehaviour, ITrackableEventHandler {
 
 
 	}
+
+	void OnEnable() {
+		GameObject.Find ("TestObject").GetComponent<qrscanner3> ().enabled = false;
+	}
 		  
 
 	public void OnTrackableStateChanged(
