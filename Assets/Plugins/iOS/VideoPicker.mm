@@ -63,6 +63,10 @@ char video_url_path[1024];
 }
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
+    const char *obj = "TestObject";
+    const char *method = "PickerDidCancel";
+    const char *msg = "Cancel";
+    UnitySendMessage(obj, method, msg);
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 @end

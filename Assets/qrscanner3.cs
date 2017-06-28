@@ -171,6 +171,8 @@ public class qrscanner3 : MonoBehaviour {
 	//		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
 			OpenContactPicker ("TestObject", "ContactPicked");//sends request to iOS with "TestObject" as return location and "ContactPicked" as callback function
 		}
+		
+
 	#else//empty functions to appease the unity editor
 
 		public void _OpenContactPicker(){
@@ -180,7 +182,9 @@ public class qrscanner3 : MonoBehaviour {
 
 		}
 
+
 	#endif
+
 	//collect returned information from iOS plugin
 	void VideoPicked( string path ){
 
@@ -213,6 +217,10 @@ public class qrscanner3 : MonoBehaviour {
 		button.GetComponent<Button> ().onClick.AddListener (() => {
 			sendTo (contactArray[1]);
 		});
+	}
+
+	public void PickerDidCancel(string cancel) {
+		GameObject.Find ("LoadingPanel").SetActive (false);
 	}
 
 	void sendTo (string number){
@@ -257,7 +265,6 @@ public class qrscanner3 : MonoBehaviour {
 		yield return request;
 		var ArgoResult = JSON.Parse (request.text);
 		yield return ArgoResult;
-		videoName = ArgoResult["response"];
 		GameObject.Find ("LoadingPanel").SetActive(false);
 		StartVuforia();
 	}
