@@ -73,13 +73,7 @@ public class qrscanner3 : MonoBehaviour {
 
 			RestartTime += Time.realtimeSinceStartup + 1f;
 		};
-
-		Debug.Log ("------------------real time since startup---------------------");
-		Debug.Log (Time.realtimeSinceStartup);
-		Debug.Log ("------------------restart time---------------------");
-		Debug.Log (RestartTime);
-		Debug.Log ("------------------real time since startup 2---------------------");
-		Debug.Log (Time.realtimeSinceStartup);
+			
 
 	}
 
@@ -92,8 +86,6 @@ public class qrscanner3 : MonoBehaviour {
 	{
 		if (BarcodeScanner != null)
 		{
-			Debug.Log ("------------------real time since startup---------------------");
-			Debug.Log (Time.realtimeSinceStartup);
 
 			BarcodeScanner.Update();
 
@@ -142,7 +134,6 @@ public class qrscanner3 : MonoBehaviour {
 	/////////////////////////////////SCANNER METHODS
 	private void StartScanner()
 	{
-		Debug.Log ("--------------scanning started-----------------");
 		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
 			BarcodeScanner.Stop();
 			if(_qrid != barCodeValue) {

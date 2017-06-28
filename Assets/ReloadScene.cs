@@ -28,13 +28,9 @@ public class ReloadScene : MonoBehaviour {
 //		SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex);
 
 		GameObject.Find ("ARCamera").GetComponent<VuforiaBehaviour> ().enabled = false;
-		Debug.Log ("---------disable vuforia behaviour----------");
 		GameObject.Find ("ARCamera").SetActive (false);
-		Debug.Log ("---------set arcamera inactive----------");
 		FindObject (GameObject.Find("HomeScreenPanel"),"RawImage").SetActive (true);	
-		Debug.Log ("---------set raw image active----------");
 		GameObject.Find ("TestObject").GetComponent<qrscanner3> ().enabled = true;
-		Debug.Log ("---------enabled qr scanner----------");
 		GameObject.Find ("ImageTarget").GetComponent<ImageTargetPlayAudio> ().enabled = false;
 
 	}
