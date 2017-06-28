@@ -350,7 +350,9 @@ public class qrscanner3 : MonoBehaviour {
 		};
 
 		//post request to amazon
-		StartCoroutine(RequireLogin(SendMessage( request)));//move to coroutine below which will wait for contact to be chosen.
+//		StartCoroutine(RequireLogin(()=>{
+		StartCoroutine(SendMessage(request));
+//		}));//move to coroutine below which will wait for contact to be chosen.
 	}
 
 	public void SetContact(){
@@ -360,6 +362,23 @@ public class qrscanner3 : MonoBehaviour {
 	}
 
 	public IEnumerator SendMessage(PostObjectRequest request){
+		GameObject VerifyPanel = FindObject(GameObject.Find("Canvas"), "VerifyPanel");
+		GameObject HomePanel = GameObject.Find ("HomeScreenPanel");
+
+		if (PlayerPrefs.GetString ("authToken").Length < 1) {
+			VerifyPanel.SetActive (true);
+			HomePanel.SetActive (false);
+		}
+
+		//verification panel will stay open until user confirms their phone number or chooses not to verify.
+		//if user chooses not to verify they will be reset at the home screen by in a separate script. 
+		while (PlayerPrefs.GetString ("authToken").Length < 1) {
+			yield return null;
+		}
+
+		VerifyPanel.SetActive (false);
+		HomePanel.SetActive (true);
+		//////above code from RequireLogin
 		GameObject ContactPicker = FindObject(GameObject.Find("Canvas"), "ContactPickerPanel");
 		GameObject homePanel = GameObject.Find ("HomeScreenPanel");
 
