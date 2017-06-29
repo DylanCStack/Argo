@@ -357,9 +357,7 @@ public class qrscanner3 : MonoBehaviour {
 		};
 
 		//post request to amazon
-//		StartCoroutine(RequireLogin(()=>{
-		StartCoroutine(SendMessage(request));
-//		}));//move to coroutine below which will wait for contact to be chosen.
+		StartCoroutine(RequireLogin(SendMessage(request)));//move to coroutine below which will wait for contact to be chosen.
 	}
 
 	public void SetContact(){
@@ -440,7 +438,9 @@ public class qrscanner3 : MonoBehaviour {
 
 		VerifyPanel.SetActive (false);
 		HomePanel.SetActive (true);
-		StartCoroutine (next);
+
+		yield return StartCoroutine (next);
+
 	}
 
 /// ///////////////////////////////FILE NAME CREATION
