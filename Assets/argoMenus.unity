@@ -4143,7 +4143,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 333972601}
-        m_MethodName: SetPublicContact
+        m_MethodName: SetContact
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7856,7 +7856,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 333972601}
-        m_MethodName: SetContact
+        m_MethodName: SetPublicContact
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

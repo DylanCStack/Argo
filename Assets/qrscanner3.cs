@@ -30,6 +30,8 @@ public class qrscanner3 : MonoBehaviour {
 	public static string _qrid;
 	private string videoName;
 	private string currentVideoName;
+	private static string aspectRatio;
+	private float currentAspectRatio;
 	private Dictionary <string, string> contacts = new Dictionary<string, string>();
 
 	public string contact = null;
@@ -188,6 +190,7 @@ public class qrscanner3 : MonoBehaviour {
 	//collect returned information from iOS plugin
 	void VideoPicked( string path ){
 
+		String[] videoInfoArray = path.Split ('|');
 		//reattatch amazon client
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
@@ -195,7 +198,13 @@ public class qrscanner3 : MonoBehaviour {
 		VideoPlayer videoPreview = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
 
 		//prepare path name for movie preview
-		string newPath = path.Replace ("file:///", "");
+		string newPath = videoInfoArray[0].Replace ("file:///", "");
+
+
+		Debug.Log (videoInfoArray [1]);
+		string aspectRatioString = videoInfoArray [1];
+		currentAspectRatio = float.Parse (aspectRatioString);
+		aspectRatio = aspectRatioString;
 
 		//assign video to imagetarget
 		videoPreview.url = newPath;
@@ -276,6 +285,9 @@ public class qrscanner3 : MonoBehaviour {
 		form.AddField ("privacy", privacy);
 		form.AddField ("recipient", recipient);
 		form.AddField ("qrid",_qrid);
+		form.AddField ("does_loop", "yes");
+		form.AddField ("premanent", "true");
+		form.AddField ("aspect_ratio", aspectRatio);
 		Dictionary<string, string> headers = form.headers;
 		headers.Add(
 			"authToken", PlayerPrefs.GetString("authToken")

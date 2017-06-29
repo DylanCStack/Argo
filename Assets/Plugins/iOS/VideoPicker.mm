@@ -8,10 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import <MobileCoreServices/MobileCoreServices.h>
+#import <AVFoundation/AVFoundation.h>
 #if UNITY_VERSION <= 434
 #import "iPhone_View.h"
 #endif
 char video_url_path[1024];
+static inline CGFloat RadiansToDegrees(CGFloat radians) {
+    return radians * 180 / M_PI;
+};
+
+
 @interface NonRotatingUIImagePickerController : UIImagePickerController
 @end
 @implementation NonRotatingUIImagePickerController
@@ -54,7 +60,30 @@ char video_url_path[1024];
         NSURL *urlvideo = [info objectForKey:UIImagePickerControllerMediaURL];
         NSLog(@"%@", urlvideo);
         NSString *urlString = [urlvideo absoluteString];
-        const char* cp = [urlString UTF8String];
+        
+        AVAsset *videoAsset = [AVAsset assetWithURL:urlvideo];
+        CGSize trackDimensions = {
+            .width = 0.0,
+            .height = 0.0,
+        };
+        
+        trackDimensions = [videoAsset naturalSize];
+        
+        float width = trackDimensions.width;
+        float height = trackDimensions.height;
+        float aspectRatio = height/width;
+        NSNumber *aspectRatioNumber = @(aspectRatio);
+        
+        NSNumberFormatter *nf = [NSNumberFormatter new];
+        nf.numberStyle = NSNumberFormatterDecimalStyle;
+        
+        NSString *aspectRatioString = [nf stringFromNumber:aspectRatioNumber];
+        NSLog(aspectRatioString);
+        
+        NSString *totalVideoString = [[urlString stringByAppendingString:@"|"]stringByAppendingString:aspectRatioString];
+        NSLog(totalVideoString);
+        
+        const char* cp = [totalVideoString UTF8String];
         strcpy(video_url_path, cp);
     }
     [self dismissViewControllerAnimated:YES completion:NULL];
