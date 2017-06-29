@@ -138,7 +138,7 @@ public class qrscanner3 : MonoBehaviour {
 	{
 		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
 			BarcodeScanner.Stop();
-			if(_qrid != barCodeValue) {
+			if(_qrid != barCodeValue && barCodeValue.Substring(0,4) == "ARGO") {
 				_qrid = barCodeValue;
 				GameObject.Find("DisplayLog").GetComponent<Text>().text = barCodeValue;
 				CoroutineWithData cd = new CoroutineWithData(this, checkURL(barCodeValue));
@@ -213,7 +213,7 @@ public class qrscanner3 : MonoBehaviour {
 		GameObject list = FindObject(GameObject.Find("Canvas"),"AddressBookPanel");
 		GameObject button = (GameObject)Instantiate(Resources.Load("AddressBookButton"), list.transform);
 		button.GetComponentInChildren<Text> ().text = contactArray [0];
-		list.GetComponent<RectTransform> ().sizeDelta = new Vector2 (100, 50 * contacts.Count);
+		list.GetComponent<RectTransform> ().sizeDelta = new Vector2 (100, 104 * contacts.Count);
 		button.GetComponent<Button> ().onClick.AddListener (() => {
 			sendTo (contactArray[1]);
 		});
@@ -221,6 +221,25 @@ public class qrscanner3 : MonoBehaviour {
 
 	public void PickerDidCancel(string cancel) {
 		GameObject.Find ("LoadingPanel").SetActive (false);
+		BarcodeScanner = null;
+		_qrid = null;
+		BarcodeScanner = new Scanner ();
+		BarcodeScanner.Camera.Play();
+		Debug.Log("--------------------STARTED-FROM-UPDATE--------------------");
+		// Display the camera texture through a RawImage
+		BarcodeScanner.OnReady += (sender, arg) => {
+			// Set Orientation & Texture
+			Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
+			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
+			Image.texture = BarcodeScanner.Camera.Texture;
+
+			// Keep Image Aspect Ratio
+			var rect = Image.GetComponent<RectTransform>();
+			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
+			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
+
+			RestartTime += Time.realtimeSinceStartup + 1f;
+		};
 	}
 
 	void sendTo (string number){
@@ -366,6 +385,10 @@ public class qrscanner3 : MonoBehaviour {
 		contact = recipient;
 		Debug.Log ("hello from set contact");
 		Debug.Log (recipient);
+	}
+
+	public void SetPublicContact() {
+		contact = "public";
 	}
 
 	public IEnumerator SendMessage(PostObjectRequest request){
