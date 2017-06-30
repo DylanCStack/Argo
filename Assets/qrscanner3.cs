@@ -15,7 +15,6 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.Runtime;
 using Amazon.S3.Util;
-using Amazon.CognitoIdentity;
 using Amazon;
 using APIKeys;
 using simpleJSON;
@@ -52,32 +51,13 @@ public class qrscanner3 : MonoBehaviour {
 	}
 		
 	void OnEnable() {
-
+		//add image for barcode scanner output
 		Image = GameObject.Find ("RawImage").GetComponent<RawImage>();
-		Debug.Log (Image);
+
 		//attach amazon details
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
-		//Destroy the old scanner when re-enabling
-		BarcodeScanner = null;
-		_qrid = null;
-		BarcodeScanner = new Scanner ();
-		BarcodeScanner.Camera.Play();
-		Debug.Log("--------------------STARTED-FROM-UPDATE--------------------");
-		// Display the camera texture through a RawImage
-		BarcodeScanner.OnReady += (sender, arg) => {
-			// Set Orientation & Texture
-			Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
-			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
-			Image.texture = BarcodeScanner.Camera.Texture;
-
-			// Keep Image Aspect Ratio
-			var rect = Image.GetComponent<RectTransform>();
-			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
-			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
-
-			RestartTime += Time.realtimeSinceStartup + 1f;
-		};
+		ConfigureScanner ();
 			
 
 	}
@@ -110,14 +90,17 @@ public class qrscanner3 : MonoBehaviour {
 
 
 
-
+	// check if a scanned url exists in our database
 	public IEnumerator checkURL(string barCodeValue) {
+		//helper method for coroutines with data - returns response from ARGO servers
 		CoroutineWithData cd = new CoroutineWithData(this, CheckArgoDB(barCodeValue));
 		yield return cd.coroutine;
 		_qrid = barCodeValue;
 
+		//parse response string in to json
 		var responseObject = JSON.Parse (cd.result.ToString());
 
+		//give feeback to signal that a barcode has been scanned
 		#if UNITY_ANDROID || UNITY_IOS
 			Handheld.Vibrate();
 		#endif
@@ -127,12 +110,12 @@ public class qrscanner3 : MonoBehaviour {
 			_OpenVideoPicker ();
 
 		} else {//video found in database
-			
+
+			//response is not an error - start vuforia
 			if (cd.result.ToString() != "error") {
 
 				videoName = responseObject["url"];
 				currentAspectRatio = responseObject ["aspect_ratio"];
-				Debug.Log ("hello video name is" + videoName);
 				StartCoroutine(
 					StartVuforia ()
 				);
@@ -146,9 +129,10 @@ public class qrscanner3 : MonoBehaviour {
 	{
 		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
 			BarcodeScanner.Stop();
+			//make sure barcode is both new and begins with ARGO
 			if(_qrid != barCodeValue && barCodeValue.Substring(0,4) == "ARGO") {
 				_qrid = barCodeValue;
-				GameObject.Find("DisplayLog").GetComponent<Text>().text = barCodeValue;
+				//helper method for coroutines with data - check to see if the qrid exists in our database
 				CoroutineWithData cd = new CoroutineWithData(this, checkURL(barCodeValue));
 			} else {
 				
@@ -157,26 +141,48 @@ public class qrscanner3 : MonoBehaviour {
 		});
 	}
 
+	private void ConfigureScanner()
+	{
+		//clears existing scanners and starts a new one
+		BarcodeScanner = null;
+		_qrid = null;
+		BarcodeScanner = new Scanner ();
+		BarcodeScanner.Camera.Play();
+
+		// Display the camera texture through a RawImage
+		BarcodeScanner.OnReady += (sender, arg) => {
+			// Set Orientation & Texture
+			Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
+			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
+			Image.texture = BarcodeScanner.Camera.Texture;
+
+			// Keep Image Aspect Ratio
+			var rect = Image.GetComponent<RectTransform>();
+			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
+			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
+
+			RestartTime += Time.realtimeSinceStartup + 1f;
+		};
+	}
+
 /////////////////////////////////iOS PLUGIN
 	#if UNITY_IOS
 		//import videopicker method from custom iOS plugin
 		[DllImport("__Internal")]
 		private static extern void OpenVideoPicker (string game_object_name, string function_name);
 
+		//import contact collector
 		[DllImport("__Internal")]
 		private static extern void OpenContactPicker (string game_object_name, string function_name);
 
+		//wrapper for imported method
 		public void _OpenVideoPicker() {
-			Debug.Log("hello from _OpenVideoPicker");
-			Debug.Log (_qrid + "from 240");
-			PlayerPrefs.SetString ("qrid", _qrid);
-			FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
 			OpenVideoPicker ("TestObject", "VideoPicked");//sends request to iOS with "TestObject" as return location and "VideoPicked" as callback function
 		}
 
+		//wrapper for imported method
 		public void _OpenContactPicker() {
 			Debug.Log("hello from _OpenContactPicker");
-	//		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
 			OpenContactPicker ("TestObject", "ContactPicked");//sends request to iOS with "TestObject" as return location and "ContactPicked" as callback function
 		}
 		
@@ -196,69 +202,77 @@ public class qrscanner3 : MonoBehaviour {
 	//collect returned information from iOS plugin
 	void VideoPicked( string path ){
 
+		//break the string in to the video path ([0]) and aspect ratio ([1])
 		String[] videoInfoArray = path.Split ('|');
-		//reattatch amazon client
-		UnityInitializer.AttachToGameObject(this.gameObject);
+
+//		//reattatch amazon client
+//		UnityInitializer.AttachToGameObject(this.gameObject);
 
 		//get image target 
-		VideoPlayer videoPreview = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
+		VideoPlayer player = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
 
 		//prepare path name for movie preview
 		string newPath = videoInfoArray[0].Replace ("file:///", "");
 
-
-		Debug.Log (videoInfoArray [1]);
+		//save aspect ratio
 		string aspectRatioString = videoInfoArray [1];
 		currentAspectRatio = float.Parse (aspectRatioString);
 		aspectRatio = aspectRatioString;
 
 		//assign video to imagetarget
-		videoPreview.url = newPath;
-		videoPreview.Play ();
+		player.url = newPath;
+		player.Play ();
 
 		//Post video to S3
 		PostObject (newPath);
 
 	}
 
+	//reciever method for a single contact
 	void ContactPicked( string name ){
-		
+
+		//split contact in to name and phone number
 		String[] contactArray = name.Split ('|');
+
+		//add this contact to the dictionary
 		contacts.Add (contactArray[0], contactArray [1]);
+
+		//add a button to the contact list to represent the new contact
 		GameObject list = FindObject(GameObject.Find("Canvas"),"AddressBookPanel");
 		GameObject button = (GameObject)Instantiate(Resources.Load("AddressBookButton"), list.transform);
 		button.GetComponentInChildren<Text> ().text = contactArray [0];
+
+		//expand the list to accomadate the new button
 		list.GetComponent<RectTransform> ().sizeDelta = new Vector2 (100, 104 * contacts.Count);
+
+		//add a click listener that sets the recipient phone number
 		button.GetComponent<Button> ().onClick.AddListener (() => {
 			sendTo (contactArray[1]);
 		});
 	}
 
+	//in case the video picker gets cancelled
 	public void PickerDidCancel(string cancel) {
-		GameObject.Find ("LoadingPanel").SetActive (false);
-		BarcodeScanner = null;
-		_qrid = null;
-		BarcodeScanner = new Scanner ();
-		BarcodeScanner.Camera.Play();
-		Debug.Log("--------------------STARTED-FROM-UPDATE--------------------");
-		// Display the camera texture through a RawImage
-		BarcodeScanner.OnReady += (sender, arg) => {
-			// Set Orientation & Texture
-			Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
-			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
-			Image.texture = BarcodeScanner.Camera.Texture;
-
-			// Keep Image Aspect Ratio
-			var rect = Image.GetComponent<RectTransform>();
-			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
-			rect.sizeDelta = new Vector2(newWidth, rect.sizeDelta.y);
-
-			RestartTime += Time.realtimeSinceStartup + 1f;
-		};
+		ConfigureScanner ();
 	}
 
+	//click function attached to contact buttons
 	void sendTo (string number){
 		recipient = number;
+	}
+
+	//sets contact after confirmation button is clicked
+	public void SetContact(){
+		contact = recipient;
+	}
+
+	//sets public contact after confirmation
+	public void SetPublicContact() {
+		contact = "public";
+	}
+
+	public void ContactPickerDidCancel() {
+		ConfigureScanner ();
 	}
 
 	/////////////////////////////////ARGO SERVER METHODS
@@ -276,11 +290,16 @@ public class qrscanner3 : MonoBehaviour {
 		var ArgoResult = JSON.Parse(request.text);
 
 		if (ArgoResult ["error"].AsBool) {
+			//handle errors
 			Debug.Log (ArgoResult ["error"]);
 			GameObject.Find("DisplayLog").GetComponent<Text>().text = ArgoResult["response"];
 			yield return @"error";
 		}
-		yield return ArgoResult["response"];
+
+		//return the name of the video if exists
+		yield return ArgoResult ["response"];
+
+		//set the aspect ratio
 		currentAspectRatio = ArgoResult ["response"]["aspect_ratio"];
 		GameObject.Find("DisplayLog").GetComponent<Text>().text = ArgoResult["response"];
 	}
@@ -303,12 +322,11 @@ public class qrscanner3 : MonoBehaviour {
 		WWW request = new WWW("https://argo-server.herokuapp.com/message/upload", form.data, headers);
 		yield return request;
 		var ArgoResult = JSON.Parse (request.text);
-		yield return ArgoResult;
 		GameObject.Find ("LoadingPanel").SetActive(false);
 		yield return StartCoroutine (
 			StartVuforia ()
 		);
-		StartCoroutine (
+		yield return StartCoroutine (
 			SaveThumbnailToS3()
 		);
 
@@ -337,9 +355,9 @@ public class qrscanner3 : MonoBehaviour {
 
 		GameObject.Find("RawImage").SetActive(false);
 
-		StartCoroutine(StopCamera(() => {
-			
-		}));
+		StartCoroutine(
+			StopCamera()
+		);
 
 
 		string bucket = "https://s3-us-west-2.amazonaws.com/eyecueargo/";
@@ -359,12 +377,6 @@ public class qrscanner3 : MonoBehaviour {
 /////////////////////////////////AMAZON CONFIGURATION AND REQUESTS
 
 	//Amazon config
-	public string IdentityPoolId = "us-west-2:bdbe6639-8a19-4315-b0ad-294039672635";
-	public string CognitoIdentityRegion = RegionEndpoint.USWest2.SystemName;
-	private RegionEndpoint _CognitoIdentityRegion
-	{
-		get { return RegionEndpoint.GetBySystemName(CognitoIdentityRegion); }
-	}
 	public string S3Region = RegionEndpoint.USWest2.SystemName;
 	private RegionEndpoint _S3Region
 	{
@@ -413,15 +425,7 @@ public class qrscanner3 : MonoBehaviour {
 		StartCoroutine(RequireLogin(SendMessage(request)));//move to coroutine below which will wait for contact to be chosen.
 	}
 
-	public void SetContact(){
-		contact = recipient;
-		Debug.Log ("hello from set contact");
-		Debug.Log (recipient);
-	}
 
-	public void SetPublicContact() {
-		contact = "public";
-	}
 
 	public IEnumerator SendMessage(PostObjectRequest request){
 		GameObject VerifyPanel = FindObject(GameObject.Find("Canvas"), "VerifyPanel");
@@ -446,7 +450,6 @@ public class qrscanner3 : MonoBehaviour {
 
 		ContactPicker.SetActive (true);
 		homePanel.SetActive(false);
-		Debug.Log ("hello from 418");
 
 		contact = null;
 
@@ -454,11 +457,10 @@ public class qrscanner3 : MonoBehaviour {
 			yield return null;
 		}
 
-		Debug.Log ("hello from 425");
 		homePanel.SetActive (true);
 		ContactPicker.SetActive (false);
-		Debug.Log ("hello from 428");
 
+		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
 		Client.PostObjectAsync(request, (responseObj) =>
 			{
 				if (responseObj.Exception == null)
@@ -518,19 +520,6 @@ public class qrscanner3 : MonoBehaviour {
 		myTexture2d.Apply ();
 		RenderTexture.active = null;
 
-
-		IntPtr pointer = texture.GetNativeTexturePtr ();
-
-		//
-		////		Color[] pixels = texture2.GetPixels(0, 0, texture.width, texture.height, 0);
-		////		Texture2D preThumbnail = new Texture2D (texture.width, texture.height);
-		////		preThumbnail.SetPixels (pixels);
-		//		TextureImporter importer = new TextureImporter();
-		//		importer.isReadable = true;
-		//		Texture2D texture2 = Texture2D.CreateExternalTexture (texture.width, texture.height, TextureFormat.Alpha8, false, false, pointer);
-
-
-		//		byte[] thumbnail = texture2.EncodeToPNG();
 		byte[] thumbnail = myTexture2d.EncodeToPNG();
 		player.Stop ();
 
@@ -610,7 +599,7 @@ public class qrscanner3 : MonoBehaviour {
 
 
 
-	public IEnumerator StopCamera(Action callback)
+	public IEnumerator StopCamera()
 	{
 		// Stop Scanning
 		Image = null;
@@ -619,8 +608,6 @@ public class qrscanner3 : MonoBehaviour {
 
 		// Wait a bit
 		yield return new WaitForSeconds(0.1f);
-
-		callback.Invoke();
 	}
 }
 

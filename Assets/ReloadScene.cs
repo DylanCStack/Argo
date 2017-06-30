@@ -19,19 +19,12 @@ public class ReloadScene : MonoBehaviour {
 	}
 
 	public void reloadScene () {
-//		if (GameObject.Find ("ARCamera")) {
-////			Destroy(GameObject.Find ("ARCamera"));
-//		}
-//		if (GameObject.Find ("TestObject")) {
-////			Destroy (GameObject.Find ("TestObject"));
-//		}
-//		SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex);
 
-		GameObject.Find ("ARCamera").GetComponent<VuforiaBehaviour> ().enabled = false;
-		GameObject.Find ("ARCamera").SetActive (false);
+		FindRootObject ("ARCamera").GetComponent<VuforiaBehaviour> ().enabled = false;
+		FindRootObject ("ARCamera").SetActive (false);
 		FindObject (GameObject.Find("HomeScreenPanel"),"RawImage").SetActive (true);	
-		GameObject.Find ("TestObject").GetComponent<qrscanner3> ().enabled = true;
-		GameObject.Find ("ImageTarget").GetComponent<ImageTargetPlayAudio> ().enabled = false;
+		FindRootObject ("TestObject").GetComponent<qrscanner3> ().enabled = true;
+		FindRootObject ("ImageTarget").GetComponent<ImageTargetPlayAudio> ().enabled = false;
 
 	}
 
@@ -39,6 +32,19 @@ public class ReloadScene : MonoBehaviour {
 	{
 		Component[] trs= parent.GetComponentsInChildren(typeof(Transform), true);
 		foreach(Component t in trs){
+			if(t.name == name){
+				return t.gameObject;
+			}
+		}
+		return null;
+	}
+
+	GameObject FindRootObject(string name)
+	{
+		List<GameObject> rootObjects = new List<GameObject>();
+		Scene scene = SceneManager.GetActiveScene();
+		scene.GetRootGameObjects( rootObjects );
+		foreach(GameObject t in rootObjects){
 			if(t.name == name){
 				return t.gameObject;
 			}
