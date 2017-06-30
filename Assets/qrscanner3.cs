@@ -32,6 +32,7 @@ public class qrscanner3 : MonoBehaviour {
 	private string currentVideoName;
 	private static string aspectRatio;
 	private float currentAspectRatio;
+	private static float orientationAngle;
 	private Dictionary <string, string> contacts = new Dictionary<string, string>();
 
 	public string contact = null;
@@ -204,7 +205,7 @@ public class qrscanner3 : MonoBehaviour {
 	//collect returned information from iOS plugin
 	void VideoPicked( string path ){
 
-		//break the string in to the video path ([0]) and aspect ratio ([1])
+		//break the string in to the video path ([0]), aspect ratio ([1]), and orientation in degrees([2])
 		String[] videoInfoArray = path.Split ('|');
 
 //		//reattatch amazon client
@@ -220,6 +221,13 @@ public class qrscanner3 : MonoBehaviour {
 		string aspectRatioString = videoInfoArray [1];
 		currentAspectRatio = float.Parse (aspectRatioString);
 		aspectRatio = aspectRatioString;
+
+		//get orientation angle
+//		if (videoInfoArray [2] == "portrait") {
+//
+//		} else {
+//
+//		}
 
 		//assign video to imagetarget
 		player.url = newPath;

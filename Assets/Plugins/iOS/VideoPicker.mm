@@ -13,6 +13,7 @@
 #import "iPhone_View.h"
 #endif
 char video_url_path[1024];
+
 static inline CGFloat RadiansToDegrees(CGFloat radians) {
     return radians * 180 / M_PI;
 };
@@ -62,26 +63,46 @@ static inline CGFloat RadiansToDegrees(CGFloat radians) {
         NSString *urlString = [urlvideo absoluteString];
         
         AVAsset *videoAsset = [AVAsset assetWithURL:urlvideo];
-        CGSize trackDimensions = {
-            .width = 0.0,
-            .height = 0.0,
-        };
         
-        trackDimensions = [videoAsset naturalSize];
+        CGFloat orgWidth;
+        CGFloat orgHeight;
         
-        float width = trackDimensions.width;
-        float height = trackDimensions.height;
-        float aspectRatio = height/width;
+        //readout the size of video
+        AVAssetTrack *vT = nil;
+        if ([[videoAsset tracksWithMediaType:AVMediaTypeVideo] count] != 0)
+        {
+            vT = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+        }
+        if (vT != nil)
+        {
+            orgWidth = vT.naturalSize.width;
+            orgHeight = vT.naturalSize.height;
+        }
+        NSString *videoOrientation;
+        //check the orientation
+        CGAffineTransform txfb = [vT preferredTransform];
+        if ((orgWidth == txfb.tx && orgHeight == txfb.ty)|(txfb.tx == 0 && txfb.ty == 0))
+        {
+            videoOrientation = @"landscape";
+            NSLog(@"Landscape");
+        }
+        else
+        {
+            videoOrientation = @"portrait";
+            NSLog(@"Portrait");
+        }
+        
+        float aspectRatio = orgHeight/orgWidth;
         NSNumber *aspectRatioNumber = @(aspectRatio);
         
         NSNumberFormatter *nf = [NSNumberFormatter new];
         nf.numberStyle = NSNumberFormatterDecimalStyle;
         
         NSString *aspectRatioString = [nf stringFromNumber:aspectRatioNumber];
-        NSLog(aspectRatioString);
+        NSLog(@"%@", aspectRatioString);
         
-        NSString *totalVideoString = [[urlString stringByAppendingString:@"|"]stringByAppendingString:aspectRatioString];
-        NSLog(totalVideoString);
+        NSString *totalVideoString = [[[[urlString stringByAppendingString:@"|"]stringByAppendingString:aspectRatioString]stringByAppendingString:@"|"]stringByAppendingString:videoOrientation];
+        NSLog(@"%@", totalVideoString);
         
         const char* cp = [totalVideoString UTF8String];
         strcpy(video_url_path, cp);
