@@ -22,8 +22,36 @@ using simpleJSON;
 
 public class qrscanner3 : MonoBehaviour {
 
-	private IScanner BarcodeScanner;
+	//Public References to GameObjects
+
+	public GameObject ARCamera;
+	public GameObject childCamera;
+	public GameObject ImageTarget;
+	public GameObject childPlane;
+
+
+	public GameObject ImageObj;
 	public RawImage Image;
+
+	public Text DisplayLog;
+	public GameObject HomeScreenPanel;
+	public GameObject AddressBookPanel;
+	public GameObject LoadingPanel;
+	public GameObject VerifyPanel;
+	public GameObject ContactPickerPanel;
+
+//	ImageTarget
+//		Plane
+//	AddressBookPanel
+//	LoadigPanel
+//	VerifyPanel
+//	HomeScreenPanel
+//	ContactPickerPanel
+//	ARCamera
+//		Camera
+	//
+
+	private IScanner BarcodeScanner;
 	private float RestartTime;
 	private WebCamTexture camTexture;
 	private Rect screenRect;
@@ -51,8 +79,6 @@ public class qrscanner3 : MonoBehaviour {
 	}
 		
 	void OnEnable() {
-		//add image for barcode scanner output
-		Image = GameObject.Find ("RawImage").GetComponent<RawImage>();
 
 		//attach amazon details
 		UnityInitializer.AttachToGameObject(this.gameObject);
@@ -209,7 +235,7 @@ public class qrscanner3 : MonoBehaviour {
 //		UnityInitializer.AttachToGameObject(this.gameObject);
 
 		//get image target 
-		VideoPlayer player = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
+		VideoPlayer player = ImageTarget.GetComponent<VideoPlayer> ();
 
 		//prepare path name for movie preview
 		string newPath = videoInfoArray[0].Replace ("file:///", "");
@@ -238,7 +264,7 @@ public class qrscanner3 : MonoBehaviour {
 		contacts.Add (contactArray[0], contactArray [1]);
 
 		//add a button to the contact list to represent the new contact
-		GameObject list = FindObject(GameObject.Find("Canvas"),"AddressBookPanel");
+		GameObject list = AddressBookPanel;
 		GameObject button = (GameObject)Instantiate(Resources.Load("AddressBookButton"), list.transform);
 		button.GetComponentInChildren<Text> ().text = contactArray [0];
 
@@ -292,7 +318,7 @@ public class qrscanner3 : MonoBehaviour {
 		if (ArgoResult ["error"].AsBool) {
 			//handle errors
 			Debug.Log (ArgoResult ["error"]);
-			GameObject.Find("DisplayLog").GetComponent<Text>().text = ArgoResult["response"];
+			DisplayLog.text = ArgoResult["response"];
 			yield return @"error";
 		}
 
@@ -301,7 +327,7 @@ public class qrscanner3 : MonoBehaviour {
 
 		//set the aspect ratio
 		currentAspectRatio = ArgoResult ["response"]["aspect_ratio"];
-		GameObject.Find("DisplayLog").GetComponent<Text>().text = ArgoResult["response"];
+		DisplayLog.text = ArgoResult["response"];
 	}
 
 	/// post a new message
@@ -322,7 +348,7 @@ public class qrscanner3 : MonoBehaviour {
 		WWW request = new WWW("https://argo-server.herokuapp.com/message/upload", form.data, headers);
 		yield return request;
 		var ArgoResult = JSON.Parse (request.text);
-		GameObject.Find ("LoadingPanel").SetActive(false);
+		LoadingPanel.SetActive(false);
 		yield return StartCoroutine (
 			StartVuforia ()
 		);
@@ -337,23 +363,18 @@ public class qrscanner3 : MonoBehaviour {
 	/////////////////////////////////VUFORIA CONFIGURATION AND ACTIVATION
 	public IEnumerator StartVuforia() {
 		//enable vuforia camera so it can track objects
-		GameObject arCamera = FindRootObject("ARCamera");
-		arCamera.SetActive (true);
-		arCamera.GetComponent<VuforiaBehaviour>().enabled = true;
-		GameObject camera = FindObject (arCamera, "Camera");
-		camera.SetActive (true);
+		ARCamera.SetActive (true);
+		ARCamera.GetComponent<VuforiaBehaviour>().enabled = true;
+		childCamera.SetActive (true);
 
-		//enable the image target so vuforia knows what to track
-		GameObject ARScanner = GameObject.Find("ImageTarget");
 
 		//enable the video player on the image target
-		VideoPlayer player = ARScanner.GetComponent<VideoPlayer>();
-		ARScanner.GetComponent<ImageTargetPlayAudio>().enabled = true;
-		GameObject videoPlane = GameObject.Find ("Plane");
+		VideoPlayer player = ImageTarget.GetComponent<VideoPlayer>();
+		ImageTarget.GetComponent<ImageTargetPlayAudio>().enabled = true;
 		Vector3 aspectRatioVector = new Vector3 (0.16F, (0.16F * currentAspectRatio), (0.16F * currentAspectRatio));
-		videoPlane.transform.localScale = aspectRatioVector;
+		childPlane.transform.localScale = aspectRatioVector;
 
-		GameObject.Find("RawImage").SetActive(false);
+		ImageObj.SetActive(false);
 
 		StartCoroutine(
 			StopCamera()
@@ -362,7 +383,7 @@ public class qrscanner3 : MonoBehaviour {
 
 		string bucket = "https://s3-us-west-2.amazonaws.com/eyecueargo/";
 		string videoName2 = videoName.Replace ("\"", "");
-		GameObject.Find ("DisplayLog").GetComponent<Text> ().text = bucket + videoName2;
+		DisplayLog.text = bucket + videoName2;
 		//set video url to value of qr code
 		if(player.url != bucket + videoName2) {
 			player.url = bucket + videoName2;
@@ -428,12 +449,10 @@ public class qrscanner3 : MonoBehaviour {
 
 
 	public IEnumerator SendMessage(PostObjectRequest request){
-		GameObject VerifyPanel = FindObject(GameObject.Find("Canvas"), "VerifyPanel");
-		GameObject HomePanel = GameObject.Find ("HomeScreenPanel");
 
 		if (PlayerPrefs.GetString ("authToken").Length < 1) {
 			VerifyPanel.SetActive (true);
-			HomePanel.SetActive (false);
+			HomeScreenPanel.SetActive (false);
 		}
 
 		//verification panel will stay open until user confirms their phone number or chooses not to verify.
@@ -443,13 +462,11 @@ public class qrscanner3 : MonoBehaviour {
 		}
 
 		VerifyPanel.SetActive (false);
-		HomePanel.SetActive (true);
+		HomeScreenPanel.SetActive (true);
 		//////above code from RequireLogin
-		GameObject ContactPicker = FindObject(GameObject.Find("Canvas"), "ContactPickerPanel");
-		GameObject homePanel = GameObject.Find ("HomeScreenPanel");
 
-		ContactPicker.SetActive (true);
-		homePanel.SetActive(false);
+		ContactPickerPanel.SetActive (true);
+		HomeScreenPanel.SetActive(false);
 
 		contact = null;
 
@@ -457,10 +474,10 @@ public class qrscanner3 : MonoBehaviour {
 			yield return null;
 		}
 
-		homePanel.SetActive (true);
-		ContactPicker.SetActive (false);
+		HomeScreenPanel.SetActive (true);
+		ContactPickerPanel.SetActive (false);
 
-		FindObject (GameObject.Find("Canvas"), "LoadingPanel").SetActive (true);
+		LoadingPanel.SetActive (true);
 		Client.PostObjectAsync(request, (responseObj) =>
 			{
 				if (responseObj.Exception == null)
@@ -481,12 +498,10 @@ public class qrscanner3 : MonoBehaviour {
 	}
 
 	public IEnumerator RequireLogin(IEnumerator next){
-		GameObject VerifyPanel = FindObject(GameObject.Find("Canvas"), "VerifyPanel");
-		GameObject HomePanel = GameObject.Find ("HomeScreenPanel");
 
 		if (PlayerPrefs.GetString ("authToken").Length < 1) {
 			VerifyPanel.SetActive (true);
-			HomePanel.SetActive (false);
+			HomeScreenPanel.SetActive (false);
 		}
 
 		//verification panel will stay open until user confirms their phone number or chooses not to verify.
@@ -496,7 +511,7 @@ public class qrscanner3 : MonoBehaviour {
 		}
 
 		VerifyPanel.SetActive (false);
-		HomePanel.SetActive (true);
+		HomeScreenPanel.SetActive (true);
 
 		yield return StartCoroutine (next);
 
@@ -505,7 +520,7 @@ public class qrscanner3 : MonoBehaviour {
 	public IEnumerator SaveThumbnailToS3() {
 		
 		yield return new WaitForSeconds(1);
-		VideoPlayer player = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
+		VideoPlayer player = ImageTarget.GetComponent<VideoPlayer> ();
 		player.Play ();
 		yield return new WaitForSeconds(1);
 		while (player.texture == null) {

@@ -26,7 +26,6 @@ public class ChangeIOSBuildNumber {
 			rootDict.SetString("Application uses Wi-Fi","YES");
 			rootDict.SetString("Privacy - Camera Usage Description","Camera access required for target detection and tracking");
 			rootDict.SetString("Privacy - Camera Usage Description","Camera access required for target detection and tracking");
-			rotDict.SetDict ();
 
 			// Write to file
 			File.WriteAllText(plistPath, plist.WriteToString());

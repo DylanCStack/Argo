@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -1599,7 +1599,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cf2c835acb714e07af84e989c11a218, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ARCamera: {fileID: 2048604240}
+  childCamera: {fileID: 2093019826}
+  ImageTarget: {fileID: 1226792420}
+  childPlane: {fileID: 1854064513}
+  ImageObj: {fileID: 1072821874}
   Image: {fileID: 1072821875}
+  DisplayLog: {fileID: 1113790287}
+  HomeScreenPanel: {fileID: 1227159107}
+  AddressBookPanel: {fileID: 488497861}
+  LoadingPanel: {fileID: 1123439418}
+  VerifyPanel: {fileID: 1423108708}
+  ContactPickerPanel: {fileID: 157682637}
   contact: 
   recipient: 
   S3Region: us-west-2
@@ -2207,7 +2218,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 225, y: -308.5}
+  m_AnchoredPosition: {x: 225, y: -308.50003}
   m_SizeDelta: {x: 250, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &406663390
@@ -3096,7 +3107,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 375, y: -489}
+  m_AnchoredPosition: {x: 375, y: -489.00003}
   m_SizeDelta: {x: 430, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &631321283
@@ -10158,6 +10169,10 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2043977942}
+--- !u!1 &2048604240 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 100000, guid: bf30d577eead1ef40bcf2b404289daf4, type: 2}
+  m_PrefabInternal: {fileID: 334537441}
 --- !u!1 &2056716950
 GameObject:
   m_ObjectHideFlags: 0
@@ -10285,6 +10300,10 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2056716950}
+--- !u!1 &2093019826 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 100002, guid: bf30d577eead1ef40bcf2b404289daf4, type: 2}
+  m_PrefabInternal: {fileID: 334537441}
 --- !u!1 &2104939284
 GameObject:
   m_ObjectHideFlags: 0
