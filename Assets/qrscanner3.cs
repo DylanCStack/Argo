@@ -502,34 +502,24 @@ public class qrscanner3 : MonoBehaviour {
 
 	public IEnumerator SaveThumbnailToS3() {
 		
-		Debug.Log ("--------------url set---------------");
 		yield return new WaitForSeconds(1);
 		VideoPlayer player = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
 		player.Play ();
-		Debug.Log ("--------------player played---------------");
 		yield return new WaitForSeconds(1);
 		while (player.texture == null) {
 			yield return null;
 		}
 
 		Texture texture = player.texture;
-		Debug.Log ("--------------texture got1---------------");
 		RenderTexture Rtexture = texture as RenderTexture;
-		Debug.Log ("--------------texture got2---------------");
 		RenderTexture.active = Rtexture;
-		Debug.Log ("--------------texture got3---------------");
 		Texture2D myTexture2d = new Texture2D (texture.width, texture.height);
-		Debug.Log ("--------------texture got4---------------");
 		myTexture2d.ReadPixels (new Rect (0, 0, Rtexture.width, Rtexture.height), 0, 0);
-		Debug.Log ("--------------texture got5---------------");
 		myTexture2d.Apply ();
-		Debug.Log ("--------------texture got6---------------");
 		RenderTexture.active = null;
-		Debug.Log ("--------------texture got7---------------");
 
 
 		IntPtr pointer = texture.GetNativeTexturePtr ();
-		Debug.Log ("--------------pointer got8---------------");
 
 		//
 		////		Color[] pixels = texture2.GetPixels(0, 0, texture.width, texture.height, 0);
@@ -542,12 +532,10 @@ public class qrscanner3 : MonoBehaviour {
 
 		//		byte[] thumbnail = texture2.EncodeToPNG();
 		byte[] thumbnail = myTexture2d.EncodeToPNG();
-		Debug.Log ("-------------thumbnail got---------------");
 		player.Stop ();
-		Debug.Log ("--------------player stop---------------");
+
 		MemoryStream stream = new MemoryStream(thumbnail);
 
-		Debug.Log ("--------------stream streamed---------------");
 		string videoName2 = videoName.Replace ("\"", "");
 		string videoName3 = videoName2.Replace (".mov", ".png");
 		//prepares request to amazon
@@ -560,7 +548,7 @@ public class qrscanner3 : MonoBehaviour {
 			Region = _S3Region
 		};
 		Debug.Log (Client);
-		Debug.Log ("--------------request configured---------------");
+
 
 		Client.PostObjectAsync(request, (responseObj) =>
 			{
@@ -573,7 +561,7 @@ public class qrscanner3 : MonoBehaviour {
 				{//did not post
 					Debug.Log("\nException while posting the result object");
 					Debug.Log(responseObj.Exception.Message);
-					Debug.Log ("--------------did not post---------------");
+
 				}
 			});
 		
