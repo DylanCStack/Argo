@@ -20,10 +20,17 @@ public class ReloadScene : MonoBehaviour {
 
 	public void reloadScene () {
 
+		Debug.Log ("-----------------Look for ARCamera---------------");
 		FindRootObject ("ARCamera").GetComponent<VuforiaBehaviour> ().enabled = false;
+		Debug.Log ("-----------------Look for ARCamera2---------------");
 		FindRootObject ("ARCamera").SetActive (false);
+		Debug.Log ("-----------------Look for HomeScreenPanel---------------");
 		FindObject (GameObject.Find("HomeScreenPanel"),"RawImage").SetActive (true);	
-		FindRootObject ("TestObject").GetComponent<qrscanner3> ().enabled = true;
+		Debug.Log ("-----------------Look for TestObject---------------");
+		GameObject testObject = GameObject.Find ("TestObject");
+		Debug.Log ("-----------------Look for qrscanner3---------------");
+		testObject.GetComponent<qrscanner3> ().enabled = true;
+		Debug.Log ("-----------------Look for ImageTarget---------------");
 		FindRootObject ("ImageTarget").GetComponent<ImageTargetPlayAudio> ().enabled = false;
 
 	}
