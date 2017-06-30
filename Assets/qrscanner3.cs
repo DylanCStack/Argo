@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
+//using UnityEditor;
 using Vuforia;
 using System.Runtime.InteropServices;
 using System.IO;
@@ -115,11 +116,13 @@ public class qrscanner3 : MonoBehaviour {
 		yield return cd.coroutine;
 		_qrid = barCodeValue;
 
+		var responseObject = JSON.Parse (cd.result.ToString());
+
 		#if UNITY_ANDROID || UNITY_IOS
 			Handheld.Vibrate();
 		#endif
 
-		if (cd.result.ToString() == "false") {	//no matching qrid in database
+		if (responseObject["url"] == "false") {	//no matching qrid in database
 			
 			_OpenVideoPicker ();
 
@@ -127,9 +130,12 @@ public class qrscanner3 : MonoBehaviour {
 			
 			if (cd.result.ToString() != "error") {
 
-				videoName = cd.result.ToString();
+				videoName = responseObject["url"];
+				currentAspectRatio = responseObject ["aspect_ratio"];
 				Debug.Log ("hello video name is" + videoName);
-				StartVuforia ();
+				StartCoroutine(
+					StartVuforia ()
+				);
 			}
 		}
 	}
@@ -271,9 +277,11 @@ public class qrscanner3 : MonoBehaviour {
 
 		if (ArgoResult ["error"].AsBool) {
 			Debug.Log (ArgoResult ["error"]);
+			GameObject.Find("DisplayLog").GetComponent<Text>().text = ArgoResult["response"];
 			yield return @"error";
 		}
-		yield return ArgoResult["response"];	
+		yield return ArgoResult["response"];
+		currentAspectRatio = ArgoResult ["response"]["aspect_ratio"];
 		GameObject.Find("DisplayLog").GetComponent<Text>().text = ArgoResult["response"];
 	}
 
@@ -285,8 +293,8 @@ public class qrscanner3 : MonoBehaviour {
 		form.AddField ("privacy", privacy);
 		form.AddField ("recipient", recipient);
 		form.AddField ("qrid",_qrid);
-		form.AddField ("does_loop", "yes");
-		form.AddField ("premanent", "true");
+		form.AddField ("does_loop", "1");
+		form.AddField ("permanent", "1");
 		form.AddField ("aspect_ratio", aspectRatio);
 		Dictionary<string, string> headers = form.headers;
 		headers.Add(
@@ -297,13 +305,19 @@ public class qrscanner3 : MonoBehaviour {
 		var ArgoResult = JSON.Parse (request.text);
 		yield return ArgoResult;
 		GameObject.Find ("LoadingPanel").SetActive(false);
-		StartVuforia();
+		yield return StartCoroutine (
+			StartVuforia ()
+		);
+		StartCoroutine (
+			SaveThumbnailToS3()
+		);
+
 	}
 
 
 
 	/////////////////////////////////VUFORIA CONFIGURATION AND ACTIVATION
-	public void StartVuforia() {
+	public IEnumerator StartVuforia() {
 		//enable vuforia camera so it can track objects
 		GameObject arCamera = FindRootObject("ARCamera");
 		arCamera.SetActive (true);
@@ -317,12 +331,16 @@ public class qrscanner3 : MonoBehaviour {
 		//enable the video player on the image target
 		VideoPlayer player = ARScanner.GetComponent<VideoPlayer>();
 		ARScanner.GetComponent<ImageTargetPlayAudio>().enabled = true;
+		GameObject videoPlane = GameObject.Find ("Plane");
+		Vector3 aspectRatioVector = new Vector3 (0.16F, (0.16F * currentAspectRatio), (0.16F * currentAspectRatio));
+		videoPlane.transform.localScale = aspectRatioVector;
 
 		GameObject.Find("RawImage").SetActive(false);
 
 		StartCoroutine(StopCamera(() => {
 			
 		}));
+
 
 		string bucket = "https://s3-us-west-2.amazonaws.com/eyecueargo/";
 		string videoName2 = videoName.Replace ("\"", "");
@@ -331,6 +349,9 @@ public class qrscanner3 : MonoBehaviour {
 		if(player.url != bucket + videoName2) {
 			player.url = bucket + videoName2;
 		}
+
+		yield return null;
+
 	}
 
 
@@ -372,10 +393,11 @@ public class qrscanner3 : MonoBehaviour {
 	{
 
 		//Adjust file name to be more readable
-		string videoName = generateVideoName(filePath);
+		videoName = generateVideoName(filePath);
 
 		//prepare file for upload
 		var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
 
 		//prepares request to amazon
 		var request = new PostObjectRequest()
@@ -476,6 +498,85 @@ public class qrscanner3 : MonoBehaviour {
 
 		yield return StartCoroutine (next);
 
+	}
+
+	public IEnumerator SaveThumbnailToS3() {
+		
+		Debug.Log ("--------------url set---------------");
+		yield return new WaitForSeconds(1);
+		VideoPlayer player = GameObject.Find ("ImageTarget").GetComponent<VideoPlayer> ();
+		player.Play ();
+		Debug.Log ("--------------player played---------------");
+		yield return new WaitForSeconds(1);
+		while (player.texture == null) {
+			yield return null;
+		}
+
+		Texture texture = player.texture;
+		Debug.Log ("--------------texture got1---------------");
+		RenderTexture Rtexture = texture as RenderTexture;
+		Debug.Log ("--------------texture got2---------------");
+		RenderTexture.active = Rtexture;
+		Debug.Log ("--------------texture got3---------------");
+		Texture2D myTexture2d = new Texture2D (texture.width, texture.height);
+		Debug.Log ("--------------texture got4---------------");
+		myTexture2d.ReadPixels (new Rect (0, 0, Rtexture.width, Rtexture.height), 0, 0);
+		Debug.Log ("--------------texture got5---------------");
+		myTexture2d.Apply ();
+		Debug.Log ("--------------texture got6---------------");
+		RenderTexture.active = null;
+		Debug.Log ("--------------texture got7---------------");
+
+
+		IntPtr pointer = texture.GetNativeTexturePtr ();
+		Debug.Log ("--------------pointer got8---------------");
+
+		//
+		////		Color[] pixels = texture2.GetPixels(0, 0, texture.width, texture.height, 0);
+		////		Texture2D preThumbnail = new Texture2D (texture.width, texture.height);
+		////		preThumbnail.SetPixels (pixels);
+		//		TextureImporter importer = new TextureImporter();
+		//		importer.isReadable = true;
+		//		Texture2D texture2 = Texture2D.CreateExternalTexture (texture.width, texture.height, TextureFormat.Alpha8, false, false, pointer);
+
+
+		//		byte[] thumbnail = texture2.EncodeToPNG();
+		byte[] thumbnail = myTexture2d.EncodeToPNG();
+		Debug.Log ("-------------thumbnail got---------------");
+		player.Stop ();
+		Debug.Log ("--------------player stop---------------");
+		MemoryStream stream = new MemoryStream(thumbnail);
+
+		Debug.Log ("--------------stream streamed---------------");
+		string videoName2 = videoName.Replace ("\"", "");
+		string videoName3 = videoName2.Replace (".mov", ".png");
+		//prepares request to amazon
+		var request = new PostObjectRequest()
+		{
+			Bucket = S3BucketName,
+			Key = videoName3,
+			InputStream = stream,
+			CannedACL = S3CannedACL.Private,
+			Region = _S3Region
+		};
+		Debug.Log (Client);
+		Debug.Log ("--------------request configured---------------");
+
+		Client.PostObjectAsync(request, (responseObj) =>
+			{
+				if (responseObj.Exception == null)
+				{//successfully posted
+					Debug.Log(string.Format("\nobject {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket));
+
+				}
+				else
+				{//did not post
+					Debug.Log("\nException while posting the result object");
+					Debug.Log(responseObj.Exception.Message);
+					Debug.Log ("--------------did not post---------------");
+				}
+			});
+		
 	}
 
 /// ///////////////////////////////FILE NAME CREATION
