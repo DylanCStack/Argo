@@ -182,6 +182,8 @@ public class qrscanner3 : MonoBehaviour {
 			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
 			Image.texture = BarcodeScanner.Camera.Texture;
 
+			Vector2 screenSize = new Vector2(Screen.width, Screen.height);
+			Image.GetComponent<RectTransform>().sizeDelta = screenSize;
 			// Keep Image Aspect Ratio
 			var rect = Image.GetComponent<RectTransform>();
 			var newWidth = rect.sizeDelta.y * BarcodeScanner.Camera.Width / BarcodeScanner.Camera.Height;
