@@ -23,9 +23,12 @@ public class ChangeIOSBuildNumber {
 			// Change value of CFBundleVersion in Xcode plist
 			rootDict.SetString("Privacy - Contacts Usage Description","Contacts are needed to facilitate message sharing.");
 			rootDict.SetString("Privacy - Photo Library Usage Description","Access Required to send Videos and Photos.");
-			rootDict.SetString("Application uses Wi-Fi","YES");
+			rootDict.SetBoolean("Application uses Wi-Fi",true);
 			rootDict.SetString("Privacy - Camera Usage Description","Camera access required for target detection and tracking");
 			rootDict.SetString("Privacy - Camera Usage Description","Camera access required for target detection and tracking");
+
+			rootDict.SetString ("CFBundleURLName", "com.EyeCue.Argo");
+			rootDict.CreateArray ("CFBundleURLSchemes").AddString ("Argo");
 
 			// Write to file
 			File.WriteAllText(plistPath, plist.WriteToString());
