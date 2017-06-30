@@ -20,7 +20,7 @@ public class ChangeIOSBuildNumber {
 			// Get root
 			PlistElementDict rootDict = plist.root;
 
-			// Change value of CFBundleVersion in Xcode plist
+			// Set plist keys/values
 			rootDict.SetString("Privacy - Contacts Usage Description","Contacts are needed to facilitate message sharing.");
 			rootDict.SetString("Privacy - Photo Library Usage Description","Access Required to send Videos and Photos.");
 			rootDict.SetBoolean("Application uses Wi-Fi",true);
@@ -32,6 +32,23 @@ public class ChangeIOSBuildNumber {
 
 			// Write to file
 			File.WriteAllText(plistPath, plist.WriteToString());
+
+			//create project with path
+			string projPath = PBXProject.GetPBXProjectPath (pathToBuiltProject);
+			PBXProject proj = new PBXProject ();
+
+			//fill project object
+			proj.ReadFromString (File.ReadAllText (projPath));
+			string target = proj.TargetGuidByName ("Unity-iPhone");
+
+			//set frameworks to import
+			proj.AddFrameworkToProject (target, "MobileCoreServices.framework", false);
+			proj.AddFrameworkToProject (target, "Contacts.framework", false);
+			proj.AddFrameworkToProject (target, "ContactsUI.framework", false);
+
+			//commit changes
+			File.WriteAllText (projPath, proj.WriteToString());
+
 		}
 	}
 }
