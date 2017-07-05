@@ -28,7 +28,7 @@ public class ChangeIOSBuildNumber {
 			rootDict.SetString("Privacy - Camera Usage Description","Camera access required for target detection and tracking");
 
 			rootDict.SetString ("CFBundleURLName", "com.EyeCue.Argo");
-			rootDict.CreateArray ("CFBundleURLSchemes").AddString ("Argo");
+			rootDict.CreateArray ("CFBundleURLSchemes").AddString ("argo");
 
 			// Write to file
 			File.WriteAllText(plistPath, plist.WriteToString());

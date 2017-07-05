@@ -23,9 +23,11 @@ public class UserFunctions : MonoBehaviour {
 	}
 
 	public IEnumerator LogIn(){
+		var args = url.Substring (url.LastIndexOf ("/")+1);
 		WWWForm login = new WWWForm ();
 		login.AddField ("phone", PlayerPrefs.GetString("phone"));
-		login.AddField ("code", url.Substring (url.Length - 5));
+		login.AddField ("code", args);
+
 
 		WWW loginRequest = new WWW ("http://argo-server.herokuapp.com/user/login", login);
 		yield return loginRequest;
