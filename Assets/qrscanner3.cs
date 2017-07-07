@@ -1,4 +1,8 @@
-﻿using BarcodeScanner;
+﻿//this script holds most of the functionality of Argo - the qrscanner, the iOS plugins, the amazon connectivity, 
+// and the connection to our own database. much of the code is borrowed from the stack overflow and unity forums, as 
+// well as documentation. 
+
+using BarcodeScanner;
 using BarcodeScanner.Scanner;
 using System;
 using System.Collections;
@@ -16,7 +20,7 @@ using Amazon.S3.Model;
 using Amazon.Runtime;
 using Amazon.S3.Util;
 using Amazon;
-using APIKeys;
+using APIKeys; //custom class to hold api keys - amazon keys have to be added in this class
 using simpleJSON;
 
 
@@ -60,6 +64,7 @@ public class qrscanner3 : MonoBehaviour {
 	private string currentVideoName;
 	private static string aspectRatio;
 	private float currentAspectRatio;
+	private static float orientationAngle;
 	private Dictionary <string, string> contacts = new Dictionary<string, string>();
 
 	public string contact = null;
@@ -235,7 +240,7 @@ public class qrscanner3 : MonoBehaviour {
 	//collect returned information from iOS plugin
 	void VideoPicked( string path ){
 
-		//break the string in to the video path ([0]) and aspect ratio ([1])
+		//break the string in to the video path ([0]), aspect ratio ([1]), and orientation in degrees([2])
 		String[] videoInfoArray = path.Split ('|');
 
 //		//reattatch amazon client
@@ -251,6 +256,13 @@ public class qrscanner3 : MonoBehaviour {
 		string aspectRatioString = videoInfoArray [1];
 		currentAspectRatio = float.Parse (aspectRatioString);
 		aspectRatio = aspectRatioString;
+
+		//get orientation angle
+//		if (videoInfoArray [2] == "portrait") {
+//
+//		} else {
+//
+//		}
 
 		//assign video to imagetarget
 		player.url = newPath;
@@ -420,7 +432,7 @@ public class qrscanner3 : MonoBehaviour {
 
 
 /////////////////////////////////AMAZON CONFIGURATION AND REQUESTS
-
+	//Make sure you place your valid basic amazon credential apikeys in the AWSKeys class!
 	//Amazon config
 	public string S3Region = RegionEndpoint.USWest2.SystemName;
 	private RegionEndpoint _S3Region
