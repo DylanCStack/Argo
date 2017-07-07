@@ -24,28 +24,31 @@ public class UserFunctions : MonoBehaviour {
 
 	public IEnumerator LogIn(){
 		var args = url.Substring (url.LastIndexOf ("/")+1);
-		WWWForm login = new WWWForm ();
-		login.AddField ("phone", PlayerPrefs.GetString("phone"));
-		login.AddField ("code", args);
+		if (args.Length == 5) {//if the app is not launching with a login 
+			WWWForm login = new WWWForm ();
+			login.AddField ("phone", PlayerPrefs.GetString("phone"));
+			login.AddField ("code", args);
 
 
-		WWW loginRequest = new WWW ("http://argo-server.herokuapp.com/user/login", login);
-		yield return loginRequest;
+			WWW loginRequest = new WWW ("http://argo-server.herokuapp.com/user/login", login);
+			yield return loginRequest;
 
-		var response = JSON.Parse (loginRequest.text);
+			var response = JSON.Parse (loginRequest.text);
 
-		if (response ["authToken"] != "false") {
-			PlayerPrefs.SetString ("authToken", response ["authToken"]);
-			log.text = "Successful login";
-			waiting = false;
-		} else if (response ["error"].AsBool) {
-			//error
-			log.text = "There was an error logging in.";
-		} else {
-			log.text = "Incorrect code or phone number. Please verify again.";
+			if (response ["authToken"] != "false") {
+				PlayerPrefs.SetString ("authToken", response ["authToken"]);
+				log.text = "Successful login";
+				waiting = false;
+			} else if (response ["error"].AsBool) {
+				//error
+				log.text = "There was an error logging in.";
+			} else {
+				log.text = "Incorrect code or phone number. Please verify again.";
+			}
+
+			log.text = loginRequest.text;
 		}
-
-		log.text = loginRequest.text;
+			
 	}
 
 
