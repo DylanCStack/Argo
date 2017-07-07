@@ -1,4 +1,8 @@
-﻿using BarcodeScanner;
+﻿//this script holds most of the functionality of Argo - the qrscanner, the iOS plugins, the amazon connectivity, 
+// and the connection to our own database. much of the code is borrowed from the stack overflow and unity forums, as 
+// well as documentation. 
+
+using BarcodeScanner;
 using BarcodeScanner.Scanner;
 using System;
 using System.Collections;
@@ -16,7 +20,7 @@ using Amazon.S3.Model;
 using Amazon.Runtime;
 using Amazon.S3.Util;
 using Amazon;
-using APIKeys;
+using APIKeys; //custom class to hold api keys - amazon keys have to be added in this class
 using simpleJSON;
 
 
@@ -385,7 +389,7 @@ public class qrscanner3 : MonoBehaviour {
 
 
 /////////////////////////////////AMAZON CONFIGURATION AND REQUESTS
-
+	//Make sure you place your valid basic amazon credential apikeys in the AWSKeys class!
 	//Amazon config
 	public string S3Region = RegionEndpoint.USWest2.SystemName;
 	private RegionEndpoint _S3Region

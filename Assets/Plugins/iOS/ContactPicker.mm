@@ -4,7 +4,7 @@
 //
 //  Created by Clayton Collins on 6/26/17.
 //
-//
+//  The native contact picker never got working - somewhere in this script is a bug that prevents the contact picker from loading on top of the super. This has to happen so that this class can be set as the delegate to recieve all the information from the functions. As it is currently, this just returns a list of the primary number of all the contacts in someones phone.
 
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <UIKit/UIKit.h>
@@ -39,8 +39,8 @@ char contact_name[1024];
 }
 
 - (void)getContacts
-{
-    CNContactStore *store = [[CNContactStore alloc] init];
+{//this is the only function used in this script, besides the initialization - collects all contacts and sends a list to unity
+    CNContactStore *store = [[CNContactStore alloc] init];//new contact store object
     [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
         if (granted == YES) {
             //keys with fetching properties
@@ -58,12 +58,12 @@ char contact_name[1024];
                         NSString *phoneNumber = [contact.phoneNumbers objectAtIndex:0].value.stringValue;
                         char c[1024];
                         strcpy(c, [[[[[firstName stringByAppendingString:@" "] stringByAppendingString:lastName] stringByAppendingString:@"|"]stringByAppendingString:phoneNumber] UTF8String]);
-                        UnitySendMessage(callback_game_object_name2, callback_function_name2, c);
+                        UnitySendMessage(callback_game_object_name2, callback_function_name2, c); // sends one message per contact to unity
                     }
                     // etc.
                 }
             }];
-        }        
+        }
     }];
 }
 #pragma mark - CNContactPickerDelegate
@@ -83,6 +83,8 @@ char contact_name[1024];
 
 @end
 
+
+//this is the portion unity can see. creates an instance of the controller and calls the function getContacts, which sends a list to the unity function specified in UnitySendMessage
 extern "C" {
     void OpenContactPicker(const char *game_object_name, const char *function_name) {
         UIViewController* parent = UnityGetGLViewController();
