@@ -21,16 +21,16 @@ public class ChangeIOSBuildNumber {
 			PlistElementDict rootDict = plist.root;
 
 			// Set plist keys/values
-			rootDict.SetString("Privacy - Contacts Usage Description","Contacts are needed to facilitate message sharing.");
-			rootDict.SetString("Privacy - Photo Library Usage Description","Access Required to send Videos and Photos.");
-			rootDict.SetBoolean("Application uses Wi-Fi",true);
-			rootDict.SetString("Privacy - Camera Usage Description","Camera access required for target detection and tracking");
-			rootDict.SetString("Privacy - Camera Usage Description","Camera access required for target detection and tracking");
+			rootDict.SetString("Privacy - Contacts Usage Description","Contacts are needed to facilitate message sharing.");//allows access to contacts
+			rootDict.SetString("Privacy - Photo Library Usage Description","Access Required to send Videos and Photos.");//allows access to photolibrary
+			rootDict.SetBoolean("Application uses Wi-Fi",true);//an attempt to lessen data usage
+			rootDict.SetString("Privacy - Camera Usage Description","Camera access required for target detection and tracking");//allows camera usage
 
+			//set custom URLScheme for app
 			rootDict.SetString ("CFBundleURLName", "com.EyeCue.Argo");
 			rootDict.CreateArray ("CFBundleURLSchemes").AddString ("argo");
 
-			// Write to file
+			// Write plist changes
 			File.WriteAllText(plistPath, plist.WriteToString());
 
 			//create project with path
@@ -42,11 +42,11 @@ public class ChangeIOSBuildNumber {
 			string target = proj.TargetGuidByName ("Unity-iPhone");
 
 			//set frameworks to import
-			proj.AddFrameworkToProject (target, "MobileCoreServices.framework", false);
-			proj.AddFrameworkToProject (target, "Contacts.framework", false);
+			proj.AddFrameworkToProject (target, "MobileCoreServices.framework", false);//needed to access Video Picker
+			proj.AddFrameworkToProject (target, "Contacts.framework", false);//needed to access Contacts
 			proj.AddFrameworkToProject (target, "ContactsUI.framework", false);
 
-			//commit changes
+			// Write framework changes
 			File.WriteAllText (projPath, proj.WriteToString());
 
 		}
