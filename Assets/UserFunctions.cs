@@ -24,7 +24,7 @@ public class UserFunctions : MonoBehaviour {
 
 	public IEnumerator LogIn(){
 		var args = url.Substring (url.LastIndexOf ("/")+1);
-		if (args.Length == 5) {//if the app is not launching with a login 
+		if (args.Length == 5) {//if the app is launching with a  5 digit login code
 			WWWForm login = new WWWForm ();
 			login.AddField ("phone", PlayerPrefs.GetString("phone"));
 			login.AddField ("code", args);
@@ -48,7 +48,7 @@ public class UserFunctions : MonoBehaviour {
 
 			log.text = loginRequest.text;
 		}
-			
+
 	}
 
 
@@ -84,27 +84,14 @@ public class UserFunctions : MonoBehaviour {
 		}
 	}
 
-
-
-//	public WWW submit(string url){//make form and submission as a repeatable funciton
-//
-//	}
-
-//	IEnumerable login(){
-//
-//	}
-
-//	IEnumerable logout(){//could be void as it would just locally delete the cookie keeping the user logged in
-//
-//	}
-
 	// Use this for initialization
 	void Start () {
-		
+
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
+		// if waiting for user to click a login link keep the waiting panel up else close it
 		if (waiting) {
 			Panel.SetActive (true);
 		} else {
