@@ -65,6 +65,11 @@ public class qrscanner3 : MonoBehaviour {
 	public string contact = null;
 	public string recipient = null;
 
+	//plurals to test sending to an arbitrary number of contacts
+	public Dictionary<string, string> contactsDict = new Dictionary<string,string>();
+	public Dictionary<string,string> recipientsDict = new Dictionary<string,string>();
+	//
+
 
 	/////////////////////////////////////////////////////////////////SCANNER METHODS
 	// Disable Screen Rotation on that screen
@@ -77,22 +82,22 @@ public class qrscanner3 : MonoBehaviour {
 	void Start () {
 		_OpenContactPicker ();
 	}
-		
+
 	void OnEnable() {
 
 		//attach amazon details
 		UnityInitializer.AttachToGameObject(this.gameObject);
 
 		ConfigureScanner ();
-			
+
 
 	}
 
 	void OnDisable() {
-		
+
 	}
-		
-		
+
+
 	void Update()
 	{
 		if (BarcodeScanner != null)
@@ -100,7 +105,7 @@ public class qrscanner3 : MonoBehaviour {
 
 			BarcodeScanner.Update();
 
-		}  
+		}
 
 		// Check if the Scanner need to be started or restarted
 		if (RestartTime != 0 && RestartTime < Time.realtimeSinceStartup)
@@ -132,7 +137,7 @@ public class qrscanner3 : MonoBehaviour {
 		#endif
 
 		if (responseObject["url"] == "false") {	//no matching qrid in database
-			
+
 			_OpenVideoPicker ();
 
 		} else {//video found in database
@@ -161,7 +166,7 @@ public class qrscanner3 : MonoBehaviour {
 				//helper method for coroutines with data - check to see if the qrid exists in our database
 				CoroutineWithData cd = new CoroutineWithData(this, checkURL(barCodeValue));
 			} else {
-				
+
 			}
 			RestartTime += 1f;
 		});
@@ -213,7 +218,7 @@ public class qrscanner3 : MonoBehaviour {
 			Debug.Log("hello from _OpenContactPicker");
 			OpenContactPicker ("TestObject", "ContactPicked");//sends request to iOS with "TestObject" as return location and "ContactPicked" as callback function
 		}
-		
+
 
 	#else//empty functions to appease the unity editor
 
@@ -236,7 +241,7 @@ public class qrscanner3 : MonoBehaviour {
 //		//reattatch amazon client
 //		UnityInitializer.AttachToGameObject(this.gameObject);
 
-		//get image target 
+		//get image target
 		VideoPlayer player = ImageTarget.GetComponent<VideoPlayer> ();
 
 		//prepare path name for movie preview
@@ -276,6 +281,8 @@ public class qrscanner3 : MonoBehaviour {
 		//add a click listener that sets the recipient phone number
 		button.GetComponent<Button> ().onClick.AddListener (() => {
 			sendTo (contactArray[1]);
+			sendToDict(contactArray[0],contactArray[1]);
+
 		});
 	}
 
@@ -288,10 +295,18 @@ public class qrscanner3 : MonoBehaviour {
 	void sendTo (string number){
 		recipient = number;
 	}
+	void sendToDict(string name, string number){
+		if (recipientsDict.ContainsKey (name)) {
+			recipientsDict.Remove (name);
+		} else {
+			recipientsDict.Add (name, number);
+		}
+	}
 
 	//sets contact after confirmation button is clicked
 	public void SetContact(){
 		contact = recipient;
+		contactsDict = recipientsDict;
 	}
 
 	//sets public contact after confirmation
@@ -353,6 +368,7 @@ public class qrscanner3 : MonoBehaviour {
 		LoadingPanel.SetActive(false);
 		yield return StartCoroutine (
 			StartVuforia ()
+			// StartDigitalPreview ()
 		);
 		yield return StartCoroutine (
 			SaveThumbnailToS3()
@@ -360,7 +376,13 @@ public class qrscanner3 : MonoBehaviour {
 
 	}
 
+	public IEnumerator StartDigitalPreview(){
+		FindRootObject ("PreviewHolder").SetActive (true);
 
+
+		StartCoroutine (StopCamera ());
+		yield return null;
+	}
 
 	/////////////////////////////////VUFORIA CONFIGURATION AND ACTIVATION
 	public IEnumerator StartVuforia() {
@@ -458,7 +480,7 @@ public class qrscanner3 : MonoBehaviour {
 		}
 
 		//verification panel will stay open until user confirms their phone number or chooses not to verify.
-		//if user chooses not to verify they will be reset at the home screen by in a separate script. 
+		//if user chooses not to verify they will be reset at the home screen by in a separate script.
 		while (PlayerPrefs.GetString ("authToken").Length < 1) {
 			yield return null;
 		}
@@ -467,12 +489,15 @@ public class qrscanner3 : MonoBehaviour {
 		HomeScreenPanel.SetActive (true);
 		//////above code from RequireLogin
 
+		//Contact panel will stay active until the user confirms their selection. Multiple contacts may be toggled on click/tap. This will not show visually.
 		ContactPickerPanel.SetActive (true);
 		HomeScreenPanel.SetActive(false);
 
 		contact = null;
+		contactsDict = null;
 
-		while (String.IsNullOrEmpty(contact)) {
+		while (contactsDict == null) {
+//		while (String.IsNullOrEmpty(contact)) {//old code from when only one contact could be chosen. Revert if multiple selections not working
 			yield return null;
 		}
 
@@ -487,9 +512,15 @@ public class qrscanner3 : MonoBehaviour {
 					Debug.Log(string.Format("\nobject {0} posted to bucket {1}", responseObj.Request.Key, responseObj.Request.Bucket));
 
 					//Post record to ArgoDB
-					StartCoroutine (
-						PostToArgoDB (videoName, "private", contact)
-					);
+					foreach(KeyValuePair<string,string> person in contactsDict){
+						StartCoroutine (
+							PostToArgoDB (videoName, "private", person.Value)
+						);
+					}
+					//old code from when only one contact could be chosen. Revert if multiple selections not working
+					// StartCoroutine(
+					// 	PostToArgoDB(videoName, "private", contact)
+					// )
 				}
 				else
 				{//did not post
@@ -500,14 +531,14 @@ public class qrscanner3 : MonoBehaviour {
 	}
 
 	public IEnumerator RequireLogin(IEnumerator next){
-
+//if the user is not logged in this will require it before the next coroutine can be run
 		if (PlayerPrefs.GetString ("authToken").Length < 1) {
 			VerifyPanel.SetActive (true);
 			HomeScreenPanel.SetActive (false);
 		}
 
 		//verification panel will stay open until user confirms their phone number or chooses not to verify.
-		//if user chooses not to verify they will be reset at the home screen by in a separate script. 
+		//if user chooses not to verify they will be reset at the home screen by in a separate script.
 		while (PlayerPrefs.GetString ("authToken").Length < 1) {
 			yield return null;
 		}
@@ -520,7 +551,7 @@ public class qrscanner3 : MonoBehaviour {
 	}
 
 	public IEnumerator SaveThumbnailToS3() {
-		
+
 		yield return new WaitForSeconds(1);
 		VideoPlayer player = ImageTarget.GetComponent<VideoPlayer> ();
 		player.Play ();
@@ -570,7 +601,7 @@ public class qrscanner3 : MonoBehaviour {
 
 				}
 			});
-		
+
 	}
 
 /// ///////////////////////////////FILE NAME CREATION
