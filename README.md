@@ -23,7 +23,10 @@ Set iOS build directory to argoIphone. This directory will be written over with 
 * Video Picker: `Assets/Plugins/iOS/VideoPicker.mm`
 * Contacts Scraper: `Assets/Plugins/iOS/ContactPicker.mm`
 
-## Amazon AWS
+## Amazon AWS configuration instructions
+* Create an S3 storage bucket - allow access by your account
+* Retrieve your security credentials from your account's security credentials page
+* Put these credentials in the namespace "APIKeys", class named AWSKeys, with public static strings named visible and secret;
 
 ## Recommended reading
 All fairly simple, but very important for interfacing with the API
